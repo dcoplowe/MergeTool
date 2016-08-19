@@ -17,13 +17,15 @@
 
 #include <iostream>
 #include <string>
+#include <unistd.h>
+//#include <cstdlib>
 
 using namespace std;
 
 //======================================================================
 // Like mergeTrees, but keeps all the branches in CCQEAntiNuTool, and
 // only merges one run.
-void mergeMCRun2(const char* inDirBase, const char* outDir, int run, const char* tag="MECAnaTool", const char* treeName="MECAna") {
+void mergeMCRun2(const char* inDirBase, const char* outDir, int run, const char* tag="MECAnaTool", const char* treeName="CC1P1Pi") {
   //******************************************************************
   //* Set Location of output files
   //******************************************************************
@@ -110,8 +112,39 @@ void mergeMCRun2(const char* inDirBase, const char* outDir, int run, const char*
   ts.Print();
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+    char const * user_name = getenv("$USER");
+    
+    string per_dir = "/pnfs/minerva/persistent/users/" + user_name;
+    string infile = per_dir + "CC1P1Pi_PL13C_180816/grid/central_value/minerva/ana/v10r8p9";
+    string outfile = per_dir;
+    string treename = "CC1P1Pi";
+    bool nominal = true;
+    
+    char cc;
+    while((cc = getopt(argc, argv, "i:h:")) != -1){
+        switch (cc){
+                case 'i': infile = optarg; break;
+                case 'o': outfile += optarg; break;
+                case 'f': nominal = false; break;
+                case 't': treename = optarg; break;
+                case 'h':
+               cout << "*********************** Run Options ***********************" << endl
+                    << " Default is to get and save files to the persistent drive  " << endl
+                    << " however other locations can be defined using the -f option" << endl
+                    << " In this case the full dir. location must be defined for   " << endl
+                    << " input and output files.                                   " << endl input option and "
+                    << " -i : \tset Set input file dir in persistent (or full dir. " << endl
+                    << "      \tset when -f is called.                             " << endl
+                    << " -o : \tset Set output file directory (or full dir. when -f" << endl
+                    << "      \tset is called.                                     " << endl
+                    << " -f : \tset Use full paths for input and output files      " << endl
+                    << " -t : \tset Set name of analysis tree. Default is CC1P1Pi  " << endl
+                    << "***********************************************************" << endl
+        }
+    }
+    
     mergeMCRun2("/pnfs/minerva/persistent/users/dcoplowe/CC1P1Pi_PL13C_180816/grid/central_value/minerva/ana/v10r8p9", "/pnfs/minerva/persistent/users/dcoplowe/", 13200, "CC1P1Pi","CC1P1Pi");
     return 0;
 }
