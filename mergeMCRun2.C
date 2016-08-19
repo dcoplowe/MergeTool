@@ -182,17 +182,17 @@ int main(int argc, char *argv[])
         }
     }
     
-    if(nominal){
-        infile += "grid/central_value/minerva/ana/";
-        infile += minervarelease;
-    }
-    else{
-        
+    //if(nominal){
+    //    infile += "grid/central_value/minerva/ana/";
+    //    infile += minervarelease;
+    //}
+    //else{
         TString tmp_infile = infile;
-    
+    TString noper_infile( tmp_infile(per_len, (int)tmp_infile.Length()) );
+    infile = noper_infile.Data();
         //infile = ;//Remove the first part or infile and outfile.
         //outfile = ;
-    }
+    //}
     
     std::cout << "   Input Name: " << infile << std::endl;
     std::cout << "  Output Name:" << outfile << std::endl;
