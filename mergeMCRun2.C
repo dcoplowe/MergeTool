@@ -153,8 +153,8 @@ int main(int argc, char *argv[])
     string treename = analname;
     bool nominal = true;
     
-    int per_len = strlen(per_dir);
-    cout << "per_dir length = " per_len << endl;
+    int per_len = per_dir.strlen();
+    cout << "per_dir length = " << per_len << endl;
     
     char cc;
     while((cc = getopt(argc, argv, "i:o:f:t:h::")) != -1){
