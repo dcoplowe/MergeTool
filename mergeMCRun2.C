@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
     string treename = analname;
     bool nominal = true;
     
-    int per_len = strlen(str1);
+    int per_len = strlen(per_dir);
     cout << "per_dir length = " per_len << endl;
     
     char cc;
@@ -189,10 +189,9 @@ int main(int argc, char *argv[])
     else{
         
         TString tmp_infile = infile;
-        
-        
-        infile = ;//Remove the first part or infile and outfile.
-        outfile = ;
+    
+        //infile = ;//Remove the first part or infile and outfile.
+        //outfile = ;
     }
     
     std::cout << "   Input Name: " << infile << std::endl;
