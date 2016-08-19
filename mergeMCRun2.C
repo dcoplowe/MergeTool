@@ -148,21 +148,24 @@ int main(int argc, char *argv[])
     string minervarelease(minerva_release);
     
     string per_dir = "/pnfs/minerva/persistent/users/" + username + "/";
-    string infile = per_dir;// + "CC1P1Pi_PL13C_180816/grid/central_value/minerva/ana/v10r8p9";
+    string infile = per_dir;
     string outfile = per_dir;
     string treename = analname;
     bool nominal = true;
+    
+    string run_s;
     
     int per_len = (int)strlen(per_dir.c_str());
     cout << "per_dir length = " << per_len << endl;
     
     char cc;
-    while((cc = getopt(argc, argv, "i:o:f:t:h::")) != -1){
+    while((cc = getopt(argc, argv, "i:o:f:t:h::n:")) != -1){
         switch (cc){
                 case 'i': infile += optarg; break;
                 case 'o': outfile += optarg; break;
                 case 'f': nominal = false; break;
                 case 't': treename = optarg; break;
+                case 'n': run_s = optarg; break;
                 case 'h':
                     std::cout << argv[0] << std::endl
                     << "*********************** Run Options ***********************" << std::endl
@@ -171,9 +174,9 @@ int main(int argc, char *argv[])
                     << " In this case the full dir. location must be defined for   " << std::endl
                     << " input and output files.                                   " << std::endl
                     << " -i : \tset Set input file dir in persistent (or full dir. " << std::endl
-                    << "      \tset when -f is called.                             " << std::endl
-                    << " -o : \tset Set output file directory (or full dir. when -f" << std::endl
-                    << "      \tset is called.                                     " << std::endl
+                    << "      \tset excluding grid/central/... when -f is called). " << std::endl
+                    << " -o : \tset Set output file directory (or full dir. when   " << std::endl
+                    << "      \tset -f is called.                                  " << std::endl
                     << " -f : \tset Use full paths for input and output files      " << std::endl
                     << " -t : \tset Set name of analysis tree. Default is CC1P1Pi  " << std::endl
                     << "***********************************************************" << std::endl;
@@ -182,35 +185,33 @@ int main(int argc, char *argv[])
         }
     }
     
-    //if(nominal){
-    //    infile += "grid/central_value/minerva/ana/";
-    //    infile += minervarelease;
-    //}
-    //else{
+    if(!nominal){
         TString tmp_infile = infile;
-    TString noper_infile( tmp_infile(per_len, (int)tmp_infile.Length()) );
-    infile = noper_infile.Data();
+        TString noper_infile( tmp_infile(per_len, (int)tmp_infile.Length()) );
+        infile = noper_infile.Data();
     
-    TString tmp_outfile = outfile;
-    TString noper_outfile(tmp_outfile(per_len, (int)tmp_outfile.Length()) );
-    outfile = noper_outfile.Data();
-        //infile = ;//Remove the first part or infile and outfile.
-        //outfile = ;
-    //}
+        TString tmp_outfile = outfile;
+        String noper_outfile(tmp_outfile(per_len, (int)tmp_outfile.Length()) );
+        outfile = noper_outfile.Data();
+    }
     
     infile += "grid/central_value/minerva/ana/" + minervarelease + "/";
+    
+    int first_run = -999;
+    int last_run =  -999;
+    TString run_ts = run_s;
+    if(run_ts.Contains("-",TString::kExact)){
+        //first_run = atoi() run_ts(0,run_ts.First("-"));
+        cout << "Start at run " << run_ts(0,run_ts.First("-")).Data() << " and end at " << run_ts(run_ts.First("-"), run_ts.Length()).Data() << endl;
+        //last_run = atoi() run_ts(run_ts.First("-"), run_ts.Length());
+    }
     
     std::cout << "   Input Name: " << infile << std::endl;
     std::cout << "  Output Name: " << outfile << std::endl;
     std::cout << "Analysis Tree: " << treename << std::endl;
     
+    
+    
     mergeMCRun2("/pnfs/minerva/persistent/users/dcoplowe/CC1P1Pi_PL13C_180816/grid/central_value/minerva/ana/v10r8p9", "/pnfs/minerva/persistent/users/dcoplowe/", 13200, "CC1P1Pi","CC1P1Pi");
     return 0;
 }
-
-/*int main()
-{
-    mergeMCRun2("/pnfs/minerva/persistent/users/dcoplowe/CC1P1Pi_PL13C_180816/grid/central_value/minerva/ana/v10r8p9", "/pnfs/minerva/persistent/users/dcoplowe/", 13200, "CC1P1Pi","CC1P1Pi");
-    return 0;
-}*/
-
