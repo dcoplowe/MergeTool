@@ -86,12 +86,12 @@ void mergeMCRun2(const char* inDirBase, const char* outDir, int run, const char*
   TStopwatch ts;
   TFile* fout=new TFile(output, "RECREATE");
   cout << "Merging ana tree" << endl;
-  setBranchStatuses(inChain);
+  //setBranchStatuses(inChain);
   fout->cd(); // Just in case the surrounding lines get separated
   inChain.Merge(fout, 32000, "keep SortBasketsByBranch");
 
   cout << "Merging truth tree" << endl;
-  setBranchStatuses(inChainTruth);
+  //setBranchStatuses(inChainTruth);
   fout->cd();
   TTree* outTreeTruth=inChainTruth.CopyTree("mc_vtx[2]>5891 && mc_vtx[2]<8439");
   outTreeTruth->Write();
