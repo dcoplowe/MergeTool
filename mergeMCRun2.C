@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
         outfile = noper_outfile.Data();
     }
     
-    infile += "grid/central_value/minerva/ana/" + minervarelease + "/";
+    infile += "/grid/central_value/minerva/ana/" + minervarelease + "/";
     
     int first_run = -999;
     int last_run =  -999;
