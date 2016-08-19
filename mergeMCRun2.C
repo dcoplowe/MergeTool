@@ -116,7 +116,9 @@ int main(int argc, char *argv[])
 {
     char const * user_name = getenv("$USER");
     
-    string per_dir = "/pnfs/minerva/persistent/users/" + &user_name;
+    cout << user_name << endl;
+    
+    string per_dir = "/pnfs/minerva/persistent/users/";// + &user_name;
     string infile = per_dir + "CC1P1Pi_PL13C_180816/grid/central_value/minerva/ana/v10r8p9";
     string outfile = per_dir;
     string treename = "CC1P1Pi";
