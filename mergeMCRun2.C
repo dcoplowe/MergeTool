@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
                     << " -t : \tset Set name of analysis tree. Default is CC1P1Pi  " << std::endl
                     << "***********************************************************" << std::endl;
                     return 1; break;
-                default: return 1;
+                default: std::cout << "Running with default options" << std::endl;
         }
     }
     
