@@ -122,15 +122,17 @@ void mergeMCRun2(const char* inDirBase, const char* outDir, int run, const char*
 
 int main(int argc, char *argv[])
 {
-    //char const * user_name = getenv("MT_USER");
-    string user_name = (string)getenv("MT_USER");
+    char const * user_name = getenv("MT_USER");
     if(!user_name){
         std::cerr << "[ERROR]: environment variable \"$USER\" not set. "
         "Cannot determine source tree location." << std::endl;
         return 1;
     }
     
-    cout << user_name << endl;
+    string username(user_name);
+    
+    cout << "1)" << user_name << endl;
+    cout << "2) " << username << endl;
     
     string per_dir = "/pnfs/minerva/persistent/users/";// + &user_name;
     string infile = per_dir + "CC1P1Pi_PL13C_180816/grid/central_value/minerva/ana/v10r8p9";
