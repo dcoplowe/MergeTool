@@ -15,6 +15,8 @@
 #include <string>
 #include <cassert>
 
+using namespace std;
+
 //======================================================================
 bool isGoodFile(const char* filename)
 {
