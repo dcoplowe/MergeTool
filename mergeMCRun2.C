@@ -122,7 +122,7 @@ void mergeMCRun2(const char* inDirBase, const char* outDir, int run, const char*
 
 int main(int argc, char *argv[])
 {
-  /* // char const * user_name = getenv("$USER");
+   // char const * user_name = getenv("$USER");
     
    // cout << user_name << endl;
     
@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
     string treename = "CC1P1Pi";
     bool nominal = true;
     
-    char cc;
+ /*   char cc;
     while((cc = getopt(argc, argv, "i:o:f:t:h:")) != -1){
         switch (cc){
                 case 'i': infile = optarg; break;
@@ -156,11 +156,11 @@ int main(int argc, char *argv[])
                     return 1; break;
                 default: std::cout << "Running with default options" << std::endl;
         }
-    }
+    }*/
     
     std::cout << "   Input Name: " << infile << std::endl;
     std::cout << "  Output Name:" << outfile << std::endl;
-    std::cout << "Analysis Tree: " << treename << std::endl;*/
+    std::cout << "Analysis Tree: " << treename << std::endl;
     
     mergeMCRun2("/pnfs/minerva/persistent/users/dcoplowe/CC1P1Pi_PL13C_180816/grid/central_value/minerva/ana/v10r8p9", "/pnfs/minerva/persistent/users/dcoplowe/", 13200, "CC1P1Pi","CC1P1Pi");
     return 0;
