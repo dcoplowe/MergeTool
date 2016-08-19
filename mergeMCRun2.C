@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
     int per_len = (int)strlen(per_dir.c_str());
     
     char cc;
-    while((cc = getopt(argc, argv, "i:o:f:t:h::n:a:m::")) != -1){
+    while((cc = getopt(argc, argv, "i:o:f:t:h::n:a:s:m::")) != -1){
         switch (cc){
                 case 'i': infile += optarg; break;
                 case 'o': outfile += optarg; break;
@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
                     << "***********************************************************" << endl;
                     return 1; break;
             default: cout << "*********** Minimum Requirements to run ***********" << endl;
-                cout << " -i Set input file dir name in persistent          " << endl;
+                     cout << " -i Set input file dir name in persistent          " << endl;
                      cout << " -n Number of runs to merge                        " << endl;
                      return 1;
         }
