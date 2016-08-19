@@ -203,10 +203,9 @@ int main(int argc, char *argv[])
     if(run_ts.Contains("-",TString::kExact)){
         //first_run = atoi() run_ts(0,run_ts.First("-"));
         TString tmp_first( run_ts(0,run_ts.First("-")) );
-        cout << tmp_first.Atoi() << endl;
+        TString tmp_last( run_ts(run_ts.First("-") + 1, run_ts.Length()) );
         first_run = tmp_first.Atoi();
-        last_run = run_ts(run_ts.First("-") + 1, run_ts.Length()).Atoi();
-        cout << "Int " << first_run << endl;
+        last_run = tmp_last.Atoi();
         cout << "Start at run " << first_run << " and end at " << last_run << endl;
         //last_run = atoi() run_ts(run_ts.First("-"), run_ts.Length());
     }
