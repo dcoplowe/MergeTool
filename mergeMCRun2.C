@@ -33,7 +33,7 @@ using namespace std;
 //======================================================================
 // Like mergeTrees, but keeps all the branches in CCQEAntiNuTool, and
 // only merges one run.
-void mergeMCRun2(const char* inDirBase, const char* outDir, int run, const char* tag="MECAnaTool", const char* treeName="CC1P1Pi") {
+void mergeMCRun2(const char* inDirBase, const char* outDir, int run, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi") {
   //******************************************************************
   //* Set Location of output files
   //******************************************************************
@@ -103,7 +103,7 @@ void mergeMCRun2(const char* inDirBase, const char* outDir, int run, const char*
   cout << "Merging truth tree" << endl;
   //setBranchStatuses(inChainTruth);
   fout->cd();
-  TTree* outTreeTruth=inChainTruth.CopyTree("mc_vtx[2]>5891 && mc_vtx[2]<8439");
+  TTree* outTreeTruth=inChainTruth.CopyTree("");
   outTreeTruth->Write();
   
   // inChainTruth.Merge(fout, 32000, "keep SortBasketsByBranch");
@@ -153,13 +153,14 @@ int main(int argc, char *argv[])
     string treename = analname;
     string ana_save_name = analname;
     bool nominal = true;
+    bool full_merge = false;
+    string merge_opt = "merge";
     
     string run_s;
-    
     int per_len = (int)strlen(per_dir.c_str());
     
     char cc;
-    while((cc = getopt(argc, argv, "i:o:f:t:h::n:a:")) != -1){
+    while((cc = getopt(argc, argv, "i:o:f:t:h::n:a:m::")) != -1){
         switch (cc){
                 case 'i': infile += optarg; break;
                 case 'o': outfile += optarg; break;
@@ -167,24 +168,27 @@ int main(int argc, char *argv[])
                 case 't': treename = optarg; break;
                 case 'n': run_s = optarg; break;
                 case 'a': ana_save_name = optarg; break;
+                case 'm': full_merge = true; break;
                 case 'h':
-                    std::cout << argv[0] << std::endl
-                    << "*********************** Run Options ***********************" << std::endl
-                    << " Default is to get and save files to the persistent drive  " << std::endl
-                    << " however other locations can be defined using the -f option" << std::endl
-                    << " In this case the full dir. location must be defined for   " << std::endl
-                    << " input and output files.                                   " << std::endl
-                    << " -i : \tset Set input file dir in persistent (or full dir. " << std::endl
-                    << "      \tset excluding grid/central/... when -f is called). " << std::endl
-                    << " -o : \tset Set output file directory (or full dir. when   " << std::endl
-                    << "      \tset -f is called).                                 " << std::endl
-                    << " -f : \tset Use full paths for input and output files      " << std::endl
-                    << " -t : \tset Set name of analysis tree. Default is " << analname << std::endl
+                    cout << argv[0] << endl
+                    << "*********************** Run Options ***********************" << endl
+                    << " Default is to get and save files to the persistent drive  " << endl
+                    << " however other locations can be defined using the -f option" << endl
+                    << " In this case the full dir. location must be defined for   " << endl
+                    << " input and output files.                                   " << endl
+                    << " -i : \tset Set input file dir in persistent (or full dir. " << endl
+                    << "      \tset excluding grid/central/... when -f is called). " << endl
+                    << " -o : \tset Set output file directory (or full dir. when   " << endl
+                    << "      \tset -f is called).                                 " << endl
+                    << " -f : \tset Use full paths for input and output files      " << endl
+                    << " -t : \tset Set name of analysis tree. Default is " << analname << endl
                     << " -n : \tset Run or run range: start-end e.g 13200-13250    " << endl
                     << "      \tset will run over 50 runs from 13200 to 13250.     " << endl
-                    << "***********************************************************" << std::endl;
+                    << " -m : \tset Merge the runs. If merge is given as an option " << endl
+                    << "      \tset then only the merging of runs will be done.    " << endl
+                    << "***********************************************************" << endl;
                     return 1; break;
-                default: std::cout << "Running with default options" << std::endl;
+                default: return 1;
         }
     }
     
