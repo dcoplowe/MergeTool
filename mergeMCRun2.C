@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
                     << "      \tset is called.                                     " << std::endl
                     << " -f : \tset Use full paths for input and output files      " << std::endl
                     << " -t : \tset Set name of analysis tree. Default is CC1P1Pi  " << std::endl
-                    << "***********************************************************" << std::endl
+                    << "***********************************************************" << std::endl;
                     return 1; break;
                 default: return 1;
         }
