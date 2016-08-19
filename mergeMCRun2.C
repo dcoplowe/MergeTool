@@ -176,9 +176,11 @@ int main(int argc, char *argv[])
                     << " -i : \tset Set input file dir in persistent (or full dir. " << std::endl
                     << "      \tset excluding grid/central/... when -f is called). " << std::endl
                     << " -o : \tset Set output file directory (or full dir. when   " << std::endl
-                    << "      \tset -f is called.                                  " << std::endl
+                    << "      \tset -f is called).                                 " << std::endl
                     << " -f : \tset Use full paths for input and output files      " << std::endl
-                    << " -t : \tset Set name of analysis tree. Default is CC1P1Pi  " << std::endl
+                    << " -t : \tset Set name of analysis tree. Default is " << analname << std::endl
+                    << " -n : \tset Run or run range: start-end e.g 13200-13250    " << endl
+                    << "      \tset will run over 50 runs from 13200 to 13250.     " << endl
                     << "***********************************************************" << std::endl;
                     return 1; break;
                 default: std::cout << "Running with default options" << std::endl;
@@ -201,12 +203,12 @@ int main(int argc, char *argv[])
     int last_run =  -999;
     TString run_ts = run_s;
     if(run_ts.Contains("-",TString::kExact)){
-        //first_run = atoi() run_ts(0,run_ts.First("-"));
+
         TString tmp_first( run_ts(0,run_ts.First("-")) );
-        TString tmp_last( run_ts(run_ts.First("-") + 1, run_ts.Length()) );
         first_run = tmp_first.Atoi();
+
+        TString tmp_last( run_ts(run_ts.First("-") + 1, run_ts.Length()) );
         last_run = tmp_last.Atoi();
-        //last_run = atoi() run_ts(run_ts.First("-"), run_ts.Length());
     }
     else{
         first_run = run_ts.Atoi();
@@ -216,12 +218,16 @@ int main(int argc, char *argv[])
     cout << "Start at run " << first_run << " and end at " << last_run << endl;
 
     
-    std::cout << "   Input Name: " << infile << std::endl;
-    std::cout << "  Output Name: " << outfile << std::endl;
-    std::cout << "Analysis Tree: " << treename << std::endl;
+    cout << "    Input Name: " << infile << endl;
+    cout << "   Output Name: " << outfile << endl;
+    cout << " Analysis Tree: " << treename << endl;
+    cout << "Merging run(s): " << run_s << endl;
     
+    for(int i=first_run; i < last_run + 1; i++){
+        cout << "Merging Run " << i << endl;
+        mergeMCRun2(infile.Data(), outfile.Data(), i, "CC1P1Pi",treename.Data());
+    }
     
-    
-    mergeMCRun2("/pnfs/minerva/persistent/users/dcoplowe/CC1P1Pi_PL13C_180816/grid/central_value/minerva/ana/v10r8p9", "/pnfs/minerva/persistent/users/dcoplowe/", 13200, "CC1P1Pi","CC1P1Pi");
+    cout << "File Merge Finished" << endl;
     return 0;
 }
