@@ -14,7 +14,7 @@
 #include <iostream>
 #include <string>
 #include <cassert>
-#include <stdlib>
+#include <stdlib.h>
 
 using namespace std;
 
