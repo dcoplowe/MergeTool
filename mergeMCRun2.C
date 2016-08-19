@@ -123,25 +123,27 @@ int main(int argc, char *argv[])
     bool nominal = true;
     
     char cc;
-    while((cc = getopt(argc, argv, "i:h:")) != -1){
+    while((cc = getopt(argc, argv, "i:o:f:t:h:")) != -1){
         switch (cc){
                 case 'i': infile = optarg; break;
                 case 'o': outfile += optarg; break;
                 case 'f': nominal = false; break;
                 case 't': treename = optarg; break;
                 case 'h':
-               cout << "*********************** Run Options ***********************" << endl
+                    cout << "*********************** Run Options ***********************" << endl
                     << " Default is to get and save files to the persistent drive  " << endl
                     << " however other locations can be defined using the -f option" << endl
                     << " In this case the full dir. location must be defined for   " << endl
-                    << " input and output files.                                   " << endl input option and "
+                    << " input and output files.                                   " << endl
                     << " -i : \tset Set input file dir in persistent (or full dir. " << endl
                     << "      \tset when -f is called.                             " << endl
                     << " -o : \tset Set output file directory (or full dir. when -f" << endl
                     << "      \tset is called.                                     " << endl
                     << " -f : \tset Use full paths for input and output files      " << endl
                     << " -t : \tset Set name of analysis tree. Default is CC1P1Pi  " << endl
-                    << "***********************************************************" << endl
+                    << "***********************************************************" << endl;
+                    return 1; break;
+                default: return 1;
         }
     }
     
