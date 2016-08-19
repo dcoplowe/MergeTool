@@ -224,7 +224,7 @@ int main(int argc, char *argv[])
     
     for(int i=first_run; i < last_run + 1; i++){
         cout << "Merging Run " << i << endl;
-        mergeMCRun2(infile, outfile, i, ana_save_name, treename);
+        mergeMCRun2(infile.c_str(), outfile.c_str(), i, ana_save_name.c_str(), treename.c_str());
     }
     
     cout << "File Merge Finished" << endl;
