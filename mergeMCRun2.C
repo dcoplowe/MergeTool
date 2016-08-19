@@ -151,21 +151,22 @@ int main(int argc, char *argv[])
     string infile = per_dir;
     string outfile = per_dir;
     string treename = analname;
+    string ana_save_name = analname;
     bool nominal = true;
     
     string run_s;
     
     int per_len = (int)strlen(per_dir.c_str());
-    cout << "per_dir length = " << per_len << endl;
     
     char cc;
-    while((cc = getopt(argc, argv, "i:o:f:t:h::n:")) != -1){
+    while((cc = getopt(argc, argv, "i:o:f:t:h::n:a:")) != -1){
         switch (cc){
                 case 'i': infile += optarg; break;
                 case 'o': outfile += optarg; break;
                 case 'f': nominal = false; break;
                 case 't': treename = optarg; break;
                 case 'n': run_s = optarg; break;
+                case 'a': ana_save_name = optarg; break;
                 case 'h':
                     std::cout << argv[0] << std::endl
                     << "*********************** Run Options ***********************" << std::endl
@@ -215,17 +216,15 @@ int main(int argc, char *argv[])
         last_run = first_run;
     }
     
-    cout << "Start at run " << first_run << " and end at " << last_run << endl;
-
-    
     cout << "    Input Name: " << infile << endl;
     cout << "   Output Name: " << outfile << endl;
     cout << " Analysis Tree: " << treename << endl;
+    cout << " Analysis Name: " << ana_save_name << endl;
     cout << "Merging run(s): " << run_s << endl;
     
     for(int i=first_run; i < last_run + 1; i++){
         cout << "Merging Run " << i << endl;
-        mergeMCRun2(infile.Data(), outfile.Data(), i, "CC1P1Pi",treename.Data());
+        mergeMCRun2(infile, outfile, i, ana_save_name, treename);
     }
     
     cout << "File Merge Finished" << endl;
