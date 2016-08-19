@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
                 case 'f': nominal = false; break;
                 case 't': treename = optarg; break;
                 case 'h':
-                    std::cout << argv[0] << endl;
+                    std::cout << argv[0] << std::endl
                     << "*********************** Run Options ***********************" << std::endl
                     << " Default is to get and save files to the persistent drive  " << std::endl
                     << " however other locations can be defined using the -f option" << std::endl
