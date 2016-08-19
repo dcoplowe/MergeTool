@@ -124,20 +124,25 @@ int main(int argc, char *argv[])
 {
     char const * user_name = getenv("MT_USER");
     if(!user_name){
-        std::cerr << "[ERROR]: environment variable \"$USER\" not set. "
+        std::cerr << "[ERROR]: environment variable \"MT_USER\" not set. "
+        "Cannot determine source tree location." << std::endl;
+        return 1;
+    }
+    
+    char const * anal_name = getenv("MT_ANAL");
+    if(!anal_name){
+        std::cerr << "[ERROR]: environment variable \"MT_ANAL\" not set. "
         "Cannot determine source tree location." << std::endl;
         return 1;
     }
     
     string username(user_name);
+    string analname(anal_name);
     
-    cout << "1)" << user_name << endl;
-    cout << "2) " << username << endl;
-    
-    string per_dir = "/pnfs/minerva/persistent/users/";// + &user_name;
+    string per_dir = "/pnfs/minerva/persistent/users/" + username;
     string infile = per_dir + "CC1P1Pi_PL13C_180816/grid/central_value/minerva/ana/v10r8p9";
     string outfile = per_dir;
-    string treename = "CC1P1Pi";
+    string treename = analname;
     bool nominal = true;
     
     char cc;
