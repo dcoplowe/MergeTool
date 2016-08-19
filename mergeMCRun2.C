@@ -198,6 +198,10 @@ int main(int argc, char *argv[])
         //outfile = ;
     //}
     
+    infile += "grid/central_value/minerva/ana/";
+    infile += minervarelease + "/";
+    //infile += "/";
+    
     std::cout << "   Input Name: " << infile << std::endl;
     std::cout << "  Output Name: " << outfile << std::endl;
     std::cout << "Analysis Tree: " << treename << std::endl;
