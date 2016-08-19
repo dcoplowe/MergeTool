@@ -159,14 +159,17 @@ int main(int argc, char *argv[])
     string run_s;
     int per_len = (int)strlen(per_dir.c_str());
     
+    bool re_opt_i = false;
+    bool re_opt_n = false;
+    
     char cc;
     while((cc = getopt(argc, argv, "i:o:f:t:h::n:a:s:m::")) != -1){
         switch (cc){
-                case 'i': infile += optarg; break;
+                case 'i': infile += optarg; re_opt_i = true; break;
                 case 'o': outfile += optarg; break;
                 case 'f': nominal = false; break;
                 case 't': treename = optarg; break;
-                case 'n': run_s = optarg; break;
+                case 'n': run_s = optarg; re_opt_n = true; break;
                 case 'a': analname = optarg; break;
                 case 's': ana_save_name = optarg; break;
                 case 'm': full_merge = true; break;
@@ -191,12 +194,19 @@ int main(int argc, char *argv[])
                     << "      \tset then only the merging of runs will be done.    " << endl
                     << "***********************************************************" << endl;
                     return 1; break;
-            default: cout << "*********** Minimum Requirements to run ***********" << endl;
-                     cout << " -i Set input file dir name in persistent          " << endl;
-                     cout << " -n Number of runs to merge                        " << endl;
-                     return 1;
+                default: return 1;
         }
     }
+    
+    if(!(re_opt_i || re_opt_n)){
+        cout << "|============ Minimum Requirements to run ============|" << endl;
+        cout << "|                                                     |" << endl;
+        cout << "|    -i Set input file dir name in persistent         |" << endl;
+        cout << "|    -n Number of runs to merge                       |" << endl;
+        cout << "|_____________________________________________________|" << endl;
+        return 0;
+    }
+    
     
     if(!nominal){
         TString tmp_infile = infile;
