@@ -13,7 +13,7 @@ OBJS = $(SRCS:.c=.o)
 MAIN = MergeFiles
 
 all:    $(MAIN)
-	@echo  MomentumDists has compiled successfully.
+	@echo  $(MAIN) has compiled successfully.
 
 $(MAIN): $(OBJS)
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(ROOTFLAGS) -o $(MAIN) $(OBJS) $(LDLIBS)
