@@ -136,19 +136,30 @@ int main(int argc, char *argv[])
         return 1;
     }
     
+    char const * minerva_release = getenv("MINERVA_RELEASE");
+    if(!minerva_release){
+        std::cerr << "[ERROR]: environment variable \"MINERVA_RELEASE\" not set. "
+        "Cannot determine source tree location." << std::endl;
+        return 1;
+    }
+    
     string username(user_name);
     string analname(anal_name);
+    string minervarelease(minerva_release);
     
-    string per_dir = "/pnfs/minerva/persistent/users/" + username;
-    string infile = per_dir + "CC1P1Pi_PL13C_180816/grid/central_value/minerva/ana/v10r8p9";
+    string per_dir = "/pnfs/minerva/persistent/users/" + username + "/";
+    string infile = per_dir;// + "CC1P1Pi_PL13C_180816/grid/central_value/minerva/ana/v10r8p9";
     string outfile = per_dir;
     string treename = analname;
     bool nominal = true;
     
+    int per_len = strlen(str1);
+    cout << "per_dir length = " per_len << endl;
+    
     char cc;
     while((cc = getopt(argc, argv, "i:o:f:t:h::")) != -1){
         switch (cc){
-                case 'i': infile = optarg; break;
+                case 'i': infile += optarg; break;
                 case 'o': outfile += optarg; break;
                 case 'f': nominal = false; break;
                 case 't': treename = optarg; break;
@@ -169,6 +180,19 @@ int main(int argc, char *argv[])
                     return 1; break;
                 default: std::cout << "Running with default options" << std::endl;
         }
+    }
+    
+    if(nominal){
+        infile += "grid/central_value/minerva/ana/";
+        infile += minervarelease;
+    }
+    else{
+        
+        TString tmp_infile = infile;
+        
+        
+        infile = ;//Remove the first part or infile and outfile.
+        outfile = ;
     }
     
     std::cout << "   Input Name: " << infile << std::endl;
