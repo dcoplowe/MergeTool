@@ -33,11 +33,11 @@ using namespace std;
 //======================================================================
 // Like mergeTrees, but keeps all the branches in CCQEAntiNuTool, and
 // only merges one run.
-void mergeMCRun2(const char* inDirBase, const char* outDir, int run, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi") {
+void mergeMCRun2(const char* inDirBase, const char* outDir, int run, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "") {
   //******************************************************************
   //* Set Location of output files
   //******************************************************************
-  TString output=TString::Format("%s/merged_%s_run%08d.root", outDir, tag, run);
+  TString output=TString::Format("%s/merged_%s_%s_run%08d.root", outDir, tag, save_name, run);
 
   //******************************************************************
   //* Load Input Ntuples
@@ -167,7 +167,8 @@ int main(int argc, char *argv[])
                 case 'f': nominal = false; break;
                 case 't': treename = optarg; break;
                 case 'n': run_s = optarg; break;
-                case 'a': ana_save_name = optarg; break;
+                case 'a': analname = optarg; break;
+                case 's': ana_save_name = optarg; break;
                 case 'm': full_merge = true; break;
                 case 'h':
                     cout << argv[0] << endl
@@ -184,11 +185,16 @@ int main(int argc, char *argv[])
                     << " -t : \tset Set name of analysis tree. Default is " << analname << endl
                     << " -n : \tset Run or run range: start-end e.g 13200-13250    " << endl
                     << "      \tset will run over 50 runs from 13200 to 13250.     " << endl
+                    << " -a : \tset Define the analysis name, defualt is " << analname << endl
+                    << " -s : \tset Set save name                                  " << endl
                     << " -m : \tset Merge the runs. If merge is given as an option " << endl
                     << "      \tset then only the merging of runs will be done.    " << endl
                     << "***********************************************************" << endl;
                     return 1; break;
-                default: return 1;
+            default: cout << "*********** Minimum Requirements to run ***********" << endl
+                     cout << " -i Set input file dir name in persistent          " << endl
+                     cout << " -n Number of runs to merge                        " << endl;
+                     return 1;
         }
     }
     
@@ -228,7 +234,7 @@ int main(int argc, char *argv[])
     
     for(int i=first_run; i < last_run + 1; i++){
         cout << "Merging Run " << i << endl;
-        mergeMCRun2(infile.c_str(), outfile.c_str(), i, ana_save_name.c_str(), treename.c_str());
+        mergeMCRun2(infile.c_str(), outfile.c_str(), i, analname.c_str(), treename.c_str(), ana_save_name.c_str());
     }
     
     cout << "File Merge Finished" << endl;
