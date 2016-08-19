@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
         //outfile = ;
     //}
     
-    infile += "grid/central_value/minerva/ana/" + nervarelease + "/";
+    infile += "grid/central_value/minerva/ana/" + minervarelease + "/";
     
     std::cout << "   Input Name: " << infile << std::endl;
     std::cout << "  Output Name: " << outfile << std::endl;
