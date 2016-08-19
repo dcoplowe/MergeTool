@@ -150,7 +150,11 @@ int main(int argc, char *argv[])
         }
     }
     
-    mergeMCRun2("/pnfs/minerva/persistent/users/dcoplowe/CC1P1Pi_PL13C_180816/grid/central_value/minerva/ana/v10r8p9", "/pnfs/minerva/persistent/users/dcoplowe/", 13200, "CC1P1Pi","CC1P1Pi");
+    std::cout << "   Input Name: " << infile << std::endl;
+    std::cout << "  Output Name:" << outfile << std::endl;
+    std::cout << "Analysis Tree: " << treename << std::endl;
+    
+    //mergeMCRun2("/pnfs/minerva/persistent/users/dcoplowe/CC1P1Pi_PL13C_180816/grid/central_value/minerva/ana/v10r8p9", "/pnfs/minerva/persistent/users/dcoplowe/", 13200, "CC1P1Pi","CC1P1Pi");
     return 0;
 }
 
