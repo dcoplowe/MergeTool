@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
         infile = noper_infile.Data();
     
         TString tmp_outfile = outfile;
-        String noper_outfile(tmp_outfile(per_len, (int)tmp_outfile.Length()) );
+        TString noper_outfile(tmp_outfile(per_len, (int)tmp_outfile.Length()) );
         outfile = noper_outfile.Data();
     }
     
