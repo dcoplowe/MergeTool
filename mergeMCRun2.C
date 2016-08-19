@@ -206,9 +206,15 @@ int main(int argc, char *argv[])
         TString tmp_last( run_ts(run_ts.First("-") + 1, run_ts.Length()) );
         first_run = tmp_first.Atoi();
         last_run = tmp_last.Atoi();
-        cout << "Start at run " << first_run << " and end at " << last_run << endl;
         //last_run = atoi() run_ts(run_ts.First("-"), run_ts.Length());
     }
+    else{
+        first_run = run_ts.Atoi();
+        last_run = first_run;
+    }
+    
+    cout << "Start at run " << first_run << " and end at " << last_run << endl;
+
     
     std::cout << "   Input Name: " << infile << std::endl;
     std::cout << "  Output Name: " << outfile << std::endl;
