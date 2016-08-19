@@ -1,4 +1,4 @@
-CXX = gcc
+CXX = g++
 CXXFLAGS = -g -Wall -fPIC
 ROOTFLAGS = `root-config --cflags --glibs`
 INCLUDE += -I$(PLOTUTILSROOT)/ #-Isrc/
