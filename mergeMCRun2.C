@@ -192,10 +192,6 @@ void mergeAllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* tre
     TChain inChain(treeName);
     TChain inChainTruth("Truth");
     
-    string runStr(TString::Format("%08d", run));
-    string runStrParts[4];
-    for(int i=0; i<4; ++i) runStrParts[i]=runStr.substr(i*2, 2);
-    
     TString inGlob(TString::Format("%s/merged_%s_%s_run*.root",outDir, tag, save_name));
     
     //From here is generic to both:
@@ -227,7 +223,7 @@ void mergeAllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* tre
     double sumPOTUsed=getTChainPOT(inChainTruth, "POT_Used");
     double sumPOTTotal=getTChainPOT(inChainTruth, "POT_Total");
     int nFilesTotal=g.gl_pathc;
-    cout << "Added " << nFiles << " files out of " << nFilesTotal << " in run " << run << endl;
+    cout << "Added " << nFiles << " files out of " << nFilesTotal << endl;
     cout << "POT totals: Total=" << sumPOTTotal << " Used=" << sumPOTUsed << endl;
     globfree(&g);
     
