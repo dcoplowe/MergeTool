@@ -191,8 +191,8 @@ int main(int argc, char *argv[])
                     << "      \tset then only the merging of runs will be done.    " << endl
                     << "***********************************************************" << endl;
                     return 1; break;
-            default: cout << "*********** Minimum Requirements to run ***********" << endl
-                     cout << " -i Set input file dir name in persistent          " << endl
+            default: cout << "*********** Minimum Requirements to run ***********" << endl;
+                cout << " -i Set input file dir name in persistent          " << endl;
                      cout << " -n Number of runs to merge                        " << endl;
                      return 1;
         }
