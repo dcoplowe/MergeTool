@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
                     << " -f : \tset Use full paths for input and output files      " << endl
                     << " -t : \tset Set name of analysis tree. Default is CC1P1Pi  " << endl
                     << "***********************************************************" << endl
-                    << << argv[0] << endl;
+                    << argv[0] << endl;
                     return 1; break;
                 default: return 1;
         }
