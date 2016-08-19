@@ -31,7 +31,7 @@
 using namespace std;
 
 
-void Merger(TChain inChain, TChain inChainTruth, TString inGlob, TString output, int run = 0){
+/*void Merger(TChain inChain, TChain inChainTruth, TString inGlob, TString output, int run = 0){
     
     cout << "Filename glob is " << inGlob << endl;
     cout << "Output filename is " << output << endl;
@@ -94,7 +94,7 @@ void Merger(TChain inChain, TChain inChainTruth, TString inGlob, TString output,
     ts.Stop();
     cout << "Merging time:" << endl;
     ts.Print();
-}
+}*/
 
 //======================================================================
 // Like mergeTrees, but keeps all the branches in CCQEAntiNuTool, and
@@ -116,7 +116,68 @@ void mergeMCRun2(const char* inDirBase, const char* outDir, int run, const char*
     for(int i=0; i<4; ++i) runStrParts[i]=runStr.substr(i*2, 2);
     TString inGlob(TString::Format("%s/%s/%s/%s/%s/SIM_*%s_*_%s*.root", inDirBase, runStrParts[0].c_str(), runStrParts[1].c_str(), runStrParts[2].c_str(), runStrParts[3].c_str(), runStr.c_str(), tag));
     
-    Merger(inChain, inChainTruth, inGlob, output, run);
+    cout << "Filename glob is " << inGlob << endl;
+    cout << "Output filename is " << output << endl;
+    
+    glob_t g;
+    glob(inGlob.Data(), 0, 0, &g);
+    
+    cout << "Total files " << g.gl_pathc << ". Adding good files" << endl;
+    
+    int nFiles=0;
+    for(int i=0; i<(int)g.gl_pathc; ++i){
+        if(i%100==0) cout << i << " " << flush;
+        const char* filename=g.gl_pathv[i];
+        if(isGoodFile(filename)){
+            inChain.Add(filename);
+            inChainTruth.Add(filename);
+            ++nFiles;
+        }
+        else{
+            cout << "Skipping " << filename << endl;
+        }
+    }
+    cout << endl;
+    
+    // For summing up the POT totals from the Meta tree
+    double sumPOTUsed=getTChainPOT(inChainTruth, "POT_Used");
+    double sumPOTTotal=getTChainPOT(inChainTruth, "POT_Total");
+    int nFilesTotal=g.gl_pathc;
+    cout << "Added " << nFiles << " files out of " << nFilesTotal << " in run " << run << endl;
+    cout << "POT totals: Total=" << sumPOTTotal << " Used=" << sumPOTUsed << endl;
+    globfree(&g);
+    
+    if(nFiles==0){
+        cout << "No files added, nothing to do..." << endl;
+        return;
+    }
+    
+    TStopwatch ts;
+    TFile* fout=new TFile(output, "RECREATE");
+    cout << "Merging ana tree" << endl;
+    //setBranchStatuses(inChain);
+    fout->cd(); // Just in case the surrounding lines get separated
+    inChain.Merge(fout, 32000, "keep SortBasketsByBranch");
+    
+    cout << "Merging truth tree" << endl;
+    //setBranchStatuses(inChainTruth);
+    fout->cd();
+    TTree* outTreeTruth=inChainTruth.CopyTree("");
+    outTreeTruth->Write();
+    
+    // inChainTruth.Merge(fout, 32000, "keep SortBasketsByBranch");
+    
+    fout->cd();
+    TTree* newMetaTree=new TTree("Meta", "Titles are stupid");
+    newMetaTree->Branch("POT_Used", &sumPOTUsed);
+    newMetaTree->Branch("POT_Total", &sumPOTTotal);
+    //if(!mc) newMetaTree->Branch("POT_Unanalyzable", &sumPOTUnanalyzable);
+    newMetaTree->Fill();
+    newMetaTree->Write();
+    ts.Stop();
+    cout << "Merging time:" << endl;
+    ts.Print();
+    //Merger(inChain, inChainTruth, inGlob, output, run);
 }
 
 void mergeAllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "") {
@@ -139,7 +200,68 @@ void mergeAllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* tre
     
     //From here is generic to both:
     
-    Merger(inChain, inChainTruth, inGlob, output);
+    cout << "Filename glob is " << inGlob << endl;
+    cout << "Output filename is " << output << endl;
+    
+    glob_t g;
+    glob(inGlob.Data(), 0, 0, &g);
+    
+    cout << "Total files " << g.gl_pathc << ". Adding good files" << endl;
+    
+    int nFiles=0;
+    for(int i=0; i<(int)g.gl_pathc; ++i){
+        if(i%100==0) cout << i << " " << flush;
+        const char* filename=g.gl_pathv[i];
+        if(isGoodFile(filename)){
+            inChain.Add(filename);
+            inChainTruth.Add(filename);
+            ++nFiles;
+        }
+        else{
+            cout << "Skipping " << filename << endl;
+        }
+    }
+    cout << endl;
+    
+    // For summing up the POT totals from the Meta tree
+    double sumPOTUsed=getTChainPOT(inChainTruth, "POT_Used");
+    double sumPOTTotal=getTChainPOT(inChainTruth, "POT_Total");
+    int nFilesTotal=g.gl_pathc;
+    cout << "Added " << nFiles << " files out of " << nFilesTotal << " in run " << run << endl;
+    cout << "POT totals: Total=" << sumPOTTotal << " Used=" << sumPOTUsed << endl;
+    globfree(&g);
+    
+    if(nFiles==0){
+        cout << "No files added, nothing to do..." << endl;
+        return;
+    }
+    
+    TStopwatch ts;
+    TFile* fout=new TFile(output, "RECREATE");
+    cout << "Merging ana tree" << endl;
+    //setBranchStatuses(inChain);
+    fout->cd(); // Just in case the surrounding lines get separated
+    inChain.Merge(fout, 32000, "keep SortBasketsByBranch");
+    
+    cout << "Merging truth tree" << endl;
+    //setBranchStatuses(inChainTruth);
+    fout->cd();
+    TTree* outTreeTruth=inChainTruth.CopyTree("");
+    outTreeTruth->Write();
+    
+    // inChainTruth.Merge(fout, 32000, "keep SortBasketsByBranch");
+    
+    fout->cd();
+    TTree* newMetaTree=new TTree("Meta", "Titles are stupid");
+    newMetaTree->Branch("POT_Used", &sumPOTUsed);
+    newMetaTree->Branch("POT_Total", &sumPOTTotal);
+    //if(!mc) newMetaTree->Branch("POT_Unanalyzable", &sumPOTUnanalyzable);
+    newMetaTree->Fill();
+    newMetaTree->Write();
+    ts.Stop();
+    cout << "Merging time:" << endl;
+    ts.Print();
+    //Merger(inChain, inChainTruth, inGlob, output);
 }
 
 int main(int argc, char *argv[])
