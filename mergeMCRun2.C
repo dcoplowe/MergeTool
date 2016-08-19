@@ -30,51 +30,6 @@
 
 using namespace std;
 
-//======================================================================
-// Like mergeTrees, but keeps all the branches in CCQEAntiNuTool, and
-// only merges one run.
-void mergeMCRun2(const char* inDirBase, const char* outDir, int run, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "") {
-    //******************************************************************
-    //* Set Location of output files
-    //******************************************************************
-    TString output=TString::Format("%s/merged_%s_%s_run%08d.root", outDir, tag, save_name, run);
-    
-    //******************************************************************
-    //* Load Input Ntuples
-    //******************************************************************
-    TChain inChain(treeName);
-    TChain inChainTruth("Truth");
-    
-    string runStr(TString::Format("%08d", run));
-    string runStrParts[4];
-    for(int i=0; i<4; ++i) runStrParts[i]=runStr.substr(i*2, 2);
-    TString inGlob(TString::Format("%s/%s/%s/%s/%s/SIM_*%s_*_%s*.root", inDirBase, runStrParts[0].c_str(), runStrParts[1].c_str(), runStrParts[2].c_str(), runStrParts[3].c_str(), runStr.c_str(), tag));
-    
-    Merger(inChain, inChainTruth, inGlob, output, run);
-}
-
-void mergeAllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "") {
-    //******************************************************************
-    //* Set Location of output files
-    //******************************************************************
-    TString output=TString::Format("%s/%s_Full.root", outDir, save_name);
-    
-    //******************************************************************
-    //* Load Input Ntuples
-    //******************************************************************
-    TChain inChain(treeName);
-    TChain inChainTruth("Truth");
-    
-    string runStr(TString::Format("%08d", run));
-    string runStrParts[4];
-    for(int i=0; i<4; ++i) runStrParts[i]=runStr.substr(i*2, 2);
-    
-    TString inGlob(TString::Format("%s/merged_%s_%s_run*.root",outDir, tag, save_name));
-    
-    //From here is generic to both:
-    
-    Merger(inChain, inChainTruth, inGlob, output);
-}
 
 void Merger(TChain inChain, TChain inChainTruth, TString inGlob, TString output, int run = 0){
     
@@ -139,6 +94,52 @@ void Merger(TChain inChain, TChain inChainTruth, TString inGlob, TString output,
     ts.Stop();
     cout << "Merging time:" << endl;
     ts.Print();
+}
+
+//======================================================================
+// Like mergeTrees, but keeps all the branches in CCQEAntiNuTool, and
+// only merges one run.
+void mergeMCRun2(const char* inDirBase, const char* outDir, int run, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "") {
+    //******************************************************************
+    //* Set Location of output files
+    //******************************************************************
+    TString output=TString::Format("%s/merged_%s_%s_run%08d.root", outDir, tag, save_name, run);
+    
+    //******************************************************************
+    //* Load Input Ntuples
+    //******************************************************************
+    TChain inChain(treeName);
+    TChain inChainTruth("Truth");
+    
+    string runStr(TString::Format("%08d", run));
+    string runStrParts[4];
+    for(int i=0; i<4; ++i) runStrParts[i]=runStr.substr(i*2, 2);
+    TString inGlob(TString::Format("%s/%s/%s/%s/%s/SIM_*%s_*_%s*.root", inDirBase, runStrParts[0].c_str(), runStrParts[1].c_str(), runStrParts[2].c_str(), runStrParts[3].c_str(), runStr.c_str(), tag));
+    
+    Merger(inChain, inChainTruth, inGlob, output, run);
+}
+
+void mergeAllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "") {
+    //******************************************************************
+    //* Set Location of output files
+    //******************************************************************
+    TString output=TString::Format("%s/%s_Full.root", outDir, save_name);
+    
+    //******************************************************************
+    //* Load Input Ntuples
+    //******************************************************************
+    TChain inChain(treeName);
+    TChain inChainTruth("Truth");
+    
+    string runStr(TString::Format("%08d", run));
+    string runStrParts[4];
+    for(int i=0; i<4; ++i) runStrParts[i]=runStr.substr(i*2, 2);
+    
+    TString inGlob(TString::Format("%s/merged_%s_%s_run*.root",outDir, tag, save_name));
+    
+    //From here is generic to both:
+    
+    Merger(inChain, inChainTruth, inGlob, output);
 }
 
 int main(int argc, char *argv[])
