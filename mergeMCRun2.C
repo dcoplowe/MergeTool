@@ -122,7 +122,8 @@ void mergeMCRun2(const char* inDirBase, const char* outDir, int run, const char*
 
 int main(int argc, char *argv[])
 {
-    char const * user_name = getenv("MT_USER");
+    //char const * user_name = getenv("MT_USER");
+    string user_name = (string)getenv("MT_USER");
     if(!user_name){
         std::cerr << "[ERROR]: environment variable \"$USER\" not set. "
         "Cannot determine source tree location." << std::endl;
