@@ -294,7 +294,7 @@ int main(int argc, char *argv[])
     string ana_save_name = analname;
     bool nominal = true;
     bool full_merge = false;
-    string merge_opt = "";
+    string merge_opt;
     
     string run_s;
     int per_len = (int)strlen(per_dir.c_str());
