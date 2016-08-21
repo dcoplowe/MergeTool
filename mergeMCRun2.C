@@ -304,6 +304,7 @@ int main(int argc, char *argv[])
     
     char cc;
     while((cc = getopt(argc, argv, "i:o:f:t:h::n:a:s:m::")) != -1){
+        cout << optarg << endl;
         switch (cc){
                 case 'i': infile += optarg; re_opt_i = true; break;
                 case 'o': outfile += optarg; break;
