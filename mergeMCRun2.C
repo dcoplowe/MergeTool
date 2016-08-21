@@ -390,9 +390,11 @@ int main(int argc, char *argv[])
     
     if(full_merge){
         if(merge_opt == "merge"){
+            cout<< "Only merging merged runs" << endl;
             mergeAllRuns(outfile.c_str(), analname.c_str(), treename.c_str(), ana_save_name.c_str());
         }
         else{
+            cout << "Merging sub-runs for each run and then merging runs" << endl;
             for(int i=first_run; i < last_run + 1; i++){
                 cout << "Merging Run " << i << endl;
                 mergeMCRun2(infile.c_str(), outfile.c_str(), i, analname.c_str(), treename.c_str(), ana_save_name.c_str());
