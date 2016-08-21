@@ -338,7 +338,7 @@ int main(int argc, char *argv[])
         }
     }
     
-    cout << "Still works" << endl;
+    cout << "Still works : " << merge_opt << endl;
     
     if(!(re_opt_i || re_opt_n)){
         cout << "|============ Minimum Requirements to run ============|" << endl;
