@@ -338,6 +338,8 @@ int main(int argc, char *argv[])
         }
     }
     
+    cout << "Still works" << endl;
+    
     if(!(re_opt_i || re_opt_n)){
         cout << "|============ Minimum Requirements to run ============|" << endl;
         cout << "|                                                     |" << endl;
