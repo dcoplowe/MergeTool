@@ -312,7 +312,7 @@ int main(int argc, char *argv[])
                 case 'n': run_s = optarg; re_opt_n = true; break;
                 case 'a': analname = optarg; break;
                 case 's': ana_save_name = optarg; break;
-                case 'm': full_merge = true; if(optarg) merge_opt = optarg; break;
+                case 'm': full_merge = true; if(optarg){ cout << "Contains optarg: " << optarg << endl; merge_opt = optarg }; break;
                 case 'h':
                 cout << argv[0] << endl
                 << "*********************** Run Options ***********************" << endl
