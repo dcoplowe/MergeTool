@@ -258,6 +258,7 @@ void mergeAllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* tre
     cout << "Merging time:" << endl;
     ts.Print();
     //Merger(inChain, inChainTruth, inGlob, output);
+    fout->Close();
 }
 
 int main(int argc, char *argv[])
@@ -313,7 +314,11 @@ int main(int argc, char *argv[])
                 case 'n': run_s = optarg; re_opt_n = true; break;
                 case 'a': analname = optarg; break;
                 case 's': ana_save_name = optarg; break;
-            case 'm': cout << "fullmerge info." << endl; full_merge = true; if(optarg){ if (optarg[0] == '=') {memmove(optarg, optarg+1, strlen(optarg));} cout << "Contains optarg: " << optarg << endl; merge_opt = optarg; } break;
+                case 'm': full_merge = true;
+                    if(optarg){
+                        if (optarg[0] == '=') {memmove(optarg, optarg+1, strlen(optarg));}
+                        cout << "Contains optarg: " << optarg << endl; merge_opt = optarg;
+                    } break;
                 case 'h':
                 cout << argv[0] << endl
                 << "*********************** Run Options ***********************" << endl
@@ -331,8 +336,9 @@ int main(int argc, char *argv[])
                 << "      \t will run over 50 runs from 13200 to 13250.     " << endl
                 << " -a : \t Define the analysis name, defualt is " << analname <<"." << endl
                 << " -s : \t Set save name.                                 " << endl
-                << " -m : \t Merge the runs. If \"merge\" is given as an arg" << endl
-                << "      \t then only the merging of runs will be done.    " << endl
+                << " -m : \t Merge the runs. If \"-m=merge\" is given as an " << endl
+                << "      \t arg then only the merging of runs will be done." << endl
+                << "      \t Here the input location is given by -o.        " << endl
                 << "***********************************************************" << endl;
                 return 1; break;
             default: return 1;
