@@ -1,38 +1,23 @@
-//******************************************************************
-//*
-//* mergeTrees.C
-//*
-//* Laura Fields
-//* 10 May 2012
-//*
-//* Merges many analysis ntuples into one (or several files) with selected branches
-//*
-//******************************************************************
+#ifndef _MERGETOOL_
+#define _MERGETOOL_
 
-#ifndef __CINT__
-#include "glob.h"
+class MergeTool {
+public:
+    MergeTool(){};
+    ~MergeTool(){};
+    
+    void EachRun(const char* inDirBase, const char* outDir, int run, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
+    void AllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
+    
+private:
+    Merge(TChain inChain, TChain inChainTruth, TString inGlob, TString output, int run = 0);
+    double MergeTool::getTChainPOT(TChain& ch, const char* branch = "POT_Used");
+    bool isGoodFile(const char* filename);
+};
+
 #endif
 
-#include "merge_common.h"
-
-#include <iostream>
-#include <string>
-#include <unistd.h>
-//#include <cstdlib>
-
-#include <iostream>
-#include <iomanip>
-#include <cstdlib>
-#include <unistd.h>
-#include <fstream>
-#include <sstream>
-#include <assert.h>
-
-using namespace std;
-
-
-/*void Merger(TChain inChain, TChain inChainTruth, TString inGlob, TString output, int run = 0){
-    
+MergeTool::Merge(TChain inChain, TChain inChainTruth, TString inGlob, TString output, int run){
     cout << "Filename glob is " << inGlob << endl;
     cout << "Output filename is " << output << endl;
     
@@ -94,20 +79,12 @@ using namespace std;
     ts.Stop();
     cout << "Merging time:" << endl;
     ts.Print();
-}*/
+}
 
-//======================================================================
-// Like mergeTrees, but keeps all the branches in CCQEAntiNuTool, and
-// only merges one run.
-void mergeMCRun2(const char* inDirBase, const char* outDir, int run, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "") {
-    //******************************************************************
-    //* Set Location of output files
-    //******************************************************************
-    TString output=TString::Format("%s/merged_%s_%s_run%08d.root", outDir, tag, save_name, run);
+
+void MergeTool::EachRun(const char* inDirBase, const char* outDir, int run, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = ""){
     
-    //******************************************************************
-    //* Load Input Ntuples
-    //******************************************************************
+    TString output=TString::Format("%s/merged_%s_%s_run%08d.root", outDir, tag, save_name, run);
     TChain inChain(treeName);
     TChain inChainTruth("Truth");
     
@@ -115,75 +92,12 @@ void mergeMCRun2(const char* inDirBase, const char* outDir, int run, const char*
     string runStrParts[4];
     for(int i=0; i<4; ++i) runStrParts[i]=runStr.substr(i*2, 2);
     TString inGlob(TString::Format("%s/%s/%s/%s/%s/SIM_*%s_*_%s*.root", inDirBase, runStrParts[0].c_str(), runStrParts[1].c_str(), runStrParts[2].c_str(), runStrParts[3].c_str(), runStr.c_str(), tag));
-    
-    cout << "Filename glob is " << inGlob << endl;
-    cout << "Output filename is " << output << endl;
-    
-    glob_t g;
-    glob(inGlob.Data(), 0, 0, &g);
-    
-    cout << "Total files " << g.gl_pathc << ". Adding good files" << endl;
-    
-    int nFiles=0;
-    for(int i=0; i<(int)g.gl_pathc; ++i){
-        if(i%100==0) cout << i << " " << flush;
-        const char* filename=g.gl_pathv[i];
-        if(isGoodFile(filename)){
-            inChain.Add(filename);
-            inChainTruth.Add(filename);
-            ++nFiles;
-        }
-        else{
-            cout << "Skipping " << filename << endl;
-        }
-    }
-    cout << endl;
-    
-    // For summing up the POT totals from the Meta tree
-    double sumPOTUsed=getTChainPOT(inChainTruth, "POT_Used");
-    double sumPOTTotal=getTChainPOT(inChainTruth, "POT_Total");
-    int nFilesTotal=g.gl_pathc;
-    cout << "Added " << nFiles << " files out of " << nFilesTotal << " in run " << run << endl;
-    cout << "POT totals: Total=" << sumPOTTotal << " Used=" << sumPOTUsed << endl;
-    globfree(&g);
-    
-    if(nFiles==0){
-        cout << "No files added, nothing to do..." << endl;
-        return;
-    }
-    
-    TStopwatch ts;
-    TFile* fout=new TFile(output, "RECREATE");
-    cout << "Merging ana tree" << endl;
-    //setBranchStatuses(inChain);
-    fout->cd(); // Just in case the surrounding lines get separated
-    inChain.Merge(fout, 32000, "keep SortBasketsByBranch");
-    
-    cout << "Merging truth tree" << endl;
-    //setBranchStatuses(inChainTruth);
-    fout->cd();
-    TTree* outTreeTruth=inChainTruth.CopyTree("");
-    outTreeTruth->Write();
-    
-    // inChainTruth.Merge(fout, 32000, "keep SortBasketsByBranch");
-    
-    fout->cd();
-    TTree* newMetaTree=new TTree("Meta", "Titles are stupid");
-    newMetaTree->Branch("POT_Used", &sumPOTUsed);
-    newMetaTree->Branch("POT_Total", &sumPOTTotal);
-    //if(!mc) newMetaTree->Branch("POT_Unanalyzable", &sumPOTUnanalyzable);
-    newMetaTree->Fill();
-    newMetaTree->Write();
-    ts.Stop();
-    cout << "Merging time:" << endl;
-    ts.Print();
-    //Merger(inChain, inChainTruth, inGlob, output, run);
+
+    Merge(inChain, inChainTruth, inGlob, output, run);
 }
 
-void mergeAllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "") {
-    //******************************************************************
-    //* Set Location of output files
-    //******************************************************************
+void MergeTool::AllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = ""){
+    
     TString output=TString::Format("%s/%s_Full.root", outDir, save_name);
     
     //******************************************************************
@@ -194,78 +108,50 @@ void mergeAllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* tre
     
     TString inGlob(TString::Format("%s/merged_%s_%s_run*.root",outDir, tag, save_name));
     
-    //From here is generic to both:
-    
-    cout << "Filename glob is " << inGlob << endl;
-    cout << "Output filename is " << output << endl;
-    
-    glob_t g;
-    glob(inGlob.Data(), 0, 0, &g);
-    
-    cout << "Total files " << g.gl_pathc << ". Adding good files" << endl;
-    
-    int nFiles=0;
-    for(int i=0; i<(int)g.gl_pathc; ++i){
-        if(i%100==0) cout << i << " " << flush;
-        const char* filename=g.gl_pathv[i];
-        if(isGoodFile(filename)){
-            inChain.Add(filename);
-            inChainTruth.Add(filename);
-            ++nFiles;
-        }
-        else{
-            cout << "Skipping " << filename << endl;
-        }
-    }
-    cout << endl;
-    
-    // For summing up the POT totals from the Meta tree
-    double sumPOTUsed=getTChainPOT(inChainTruth, "POT_Used");
-    double sumPOTTotal=getTChainPOT(inChainTruth, "POT_Total");
-    int nFilesTotal=g.gl_pathc;
-    cout << "Added " << nFiles << " files out of " << nFilesTotal << endl;
-    cout << "POT totals: Total=" << sumPOTTotal << " Used=" << sumPOTUsed << endl;
-    globfree(&g);
-    
-    if(nFiles==0){
-        cout << "No files added, nothing to do..." << endl;
-        return;
-    }
-    
-    TStopwatch ts;
-    TFile* fout=new TFile(output, "RECREATE");
-    cout << "Merging ana tree" << endl;
-    //setBranchStatuses(inChain);
-    fout->cd(); // Just in case the surrounding lines get separated
-    inChain.Merge(fout, 32000, "keep SortBasketsByBranch");
-    
-    cout << "Merging truth tree" << endl;
-    //setBranchStatuses(inChainTruth);
-    fout->cd();
-    TTree* outTreeTruth=inChainTruth.CopyTree("");
-    outTreeTruth->Write();
-    
-    // inChainTruth.Merge(fout, 32000, "keep SortBasketsByBranch");
-    
-    fout->cd();
-    TTree* newMetaTree=new TTree("Meta", "Titles are stupid");
-    newMetaTree->Branch("POT_Used", &sumPOTUsed);
-    newMetaTree->Branch("POT_Total", &sumPOTTotal);
-    //if(!mc) newMetaTree->Branch("POT_Unanalyzable", &sumPOTUnanalyzable);
-    newMetaTree->Fill();
-    newMetaTree->Write();
-    ts.Stop();
-    cout << "Merging time:" << endl;
-    ts.Print();
-    //Merger(inChain, inChainTruth, inGlob, output);
-    fout->Close();
+    Merge(inChain, inChainTruth, inGlob, output);
 }
+
+double MergeTool::getTChainPOT(TChain& ch, const char* branch)
+{
+    double sumPOTUsed=0;
+    
+    TObjArray *fileElements=ch.GetListOfFiles();
+    TIter next(fileElements);
+    TChainElement *chEl=0;
+    while (( chEl=(TChainElement*)next() )) {
+        TFile f(chEl->GetTitle());
+        TTree* t=(TTree*)f.Get("Meta");
+        if(!t){
+            cout << "No Meta tree in file " << chEl->GetTitle() << endl;
+            continue;
+        }
+        assert(t->GetEntries()==1);
+        t->GetEntry(0);
+        TLeaf* lUsed=t->GetLeaf(branch);
+        if(lUsed)         sumPOTUsed+=lUsed->GetValue();
+    }
+    
+    return sumPOTUsed;
+}
+
+bool MergeTool::isGoodFile(const char* filename)
+{
+    TFile f(filename);
+    if(f.IsZombie()) return false;
+    TTree* meta=(TTree*)f.Get("Meta");
+    if(!meta) return false;
+    if(!meta->GetBranch("POT_Total")) return false;
+    if(!meta->GetBranch("POT_Used")) return false;
+    if(!f.Get("Truth")) return false;
+    return true;
+}
+
 
 int main(int argc, char *argv[])
 {
-    char const * user_name = getenv("MT_USER");
+    char const * user_name = getenv("USER");
     if(!user_name){
-        std::cerr << "[ERROR]: environment variable \"MT_USER\" not set. "
+        std::cerr << "[ERROR]: environment variable \"USER\" not set. "
         "Cannot determine source tree location." << std::endl;
         return 1;
     }
@@ -307,19 +193,19 @@ int main(int argc, char *argv[])
     while((cc = getopt(argc, argv, "i:o:f:t:h::n:a:s:m::")) != -1){
         cout << optarg << endl;
         switch (cc){
-                case 'i': infile += optarg; re_opt_i = true; break;
-                case 'o': outfile += optarg; break;
-                case 'f': nominal = false; break;
-                case 't': treename = optarg; break;
-                case 'n': run_s = optarg; re_opt_n = true; break;
-                case 'a': analname = optarg; break;
-                case 's': ana_save_name = optarg; break;
-                case 'm': full_merge = true;
-                    if(optarg){
-                        if (optarg[0] == '=') {memmove(optarg, optarg+1, strlen(optarg));}
-                        cout << "Contains optarg: " << optarg << endl; merge_opt = optarg;
-                    } break;
-                case 'h':
+            case 'i': infile += optarg; re_opt_i = true; break;
+            case 'o': outfile += optarg; break;
+            case 'f': nominal = false; break;
+            case 't': treename = optarg; break;
+            case 'n': run_s = optarg; re_opt_n = true; break;
+            case 'a': analname = optarg; break;
+            case 's': ana_save_name = optarg; break;
+            case 'm': full_merge = true;
+                if(optarg){
+                    if (optarg[0] == '=') {memmove(optarg, optarg+1, strlen(optarg));}
+                    cout << "Contains optarg: " << optarg << endl; merge_opt = optarg;
+                } break;
+            case 'h':
                 //cout << argv[0] << endl
                 cout << "*********************** Run Options ***********************" << endl
                 << " Default is to get and save files to the persistent drive  " << endl
@@ -345,8 +231,6 @@ int main(int argc, char *argv[])
         }
     }
     
-    cout << "Still works : " << merge_opt << endl;
-    
     if(!(re_opt_i || re_opt_n)){
         cout << "|============ Minimum Requirements to run ============|" << endl;
         cout << "|                                                     |" << endl;
@@ -355,7 +239,6 @@ int main(int argc, char *argv[])
         cout << "|_____________________________________________________|" << endl;
         return 0;
     }
-    
     
     if(!nominal){
         TString tmp_infile = infile;
@@ -395,29 +278,32 @@ int main(int argc, char *argv[])
         cout << "Full Merge Called" << endl;
     }
     
+    MergeTool * merger = new MergeTool();
+    
     if(full_merge){
         if(merge_opt == "merge"){
             cout<< "Only merging merged runs" << endl;
-            mergeAllRuns(outfile.c_str(), analname.c_str(), treename.c_str(), ana_save_name.c_str());
+            merger->AllRuns(outfile.c_str(), analname.c_str(), treename.c_str(), ana_save_name.c_str());
         }
         else{
             cout << "Merging sub-runs for each run and then merging runs" << endl;
             for(int i=first_run; i < last_run + 1; i++){
                 cout << "Merging Run " << i << endl;
-                mergeMCRun2(infile.c_str(), outfile.c_str(), i, analname.c_str(), treename.c_str(), ana_save_name.c_str());
+                merger->EachRun(infile.c_str(), outfile.c_str(), i, analname.c_str(), treename.c_str(), ana_save_name.c_str());
             }
-            mergeAllRuns(outfile.c_str(), analname.c_str(), treename.c_str(), ana_save_name.c_str());
+            merger->AllRuns(outfile.c_str(), analname.c_str(), treename.c_str(), ana_save_name.c_str());
         }
         
     }
     else{
         for(int i=first_run; i < last_run + 1; i++){
             cout << "Merging Run " << i << endl;
-            mergeMCRun2(infile.c_str(), outfile.c_str(), i, analname.c_str(), treename.c_str(), ana_save_name.c_str());
+            merger->EachRun(infile.c_str(), outfile.c_str(), i, analname.c_str(), treename.c_str(), ana_save_name.c_str());
         }
         
     }
-
+    
+    delete merger;
     cout << "File Merge Finished" << endl;
     return 0;
 }
