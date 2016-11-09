@@ -310,8 +310,8 @@ int main(int argc, char *argv[])
     cout << "| Input  (-i): " << infile << endl;
     cout << "| N Runs (-n): " << run_s << endl;
     cout << "| Output (-o): " << outfile << endl;
-    cout << "| Analysis Tree Name (-t): " << anal_tree << endl;
-    cout << "| Analysis Tool Name (-a): " << anal_tool << endl;
+    cout << "| Analysis Tree Name (-t): " << analtree << endl;
+    cout << "| Analysis Tool Name (-a): " << analtool << endl;
     cout << "| Optional Save Name (-s): " << ana_save_name << endl;
     cout << "|--------------------------------- Running ----------------------------------" << endl;
     
