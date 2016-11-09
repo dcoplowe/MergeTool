@@ -175,13 +175,19 @@ int main(int argc, char *argv[])
         
     }
     
-    char const * anal_name = getenv("ANATREE");
+    char const * anal_name = getenv("ANATREENAME");
     if(!anal_name){
         std::cout << "[WARNING]: Environment variable \"ANATREE\" not set. To set see requirements file." << std::endl;
     }
     
+    char const * analtool_name = getenv("ANATREENAME");
+    if(!analtool_name){
+        std::cout << "[WARNING]: Environment variable \"ANATREENAME\" not set. To set see requirements file." << std::endl;
+    }
+    
     string username(user_name);
     string anatree(anal_name);// t -- set tree
+    string ananame(analtool_name);
     
     string ana_save_name = "SMILE";// s -- savename
     
