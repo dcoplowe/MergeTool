@@ -27,14 +27,14 @@ public:
     void AllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
     
 private:
-    Merge(TChain inChain, TChain inChainTruth, TString inGlob, TString output, int run = 0);
-    double MergeTool::getTChainPOT(TChain& ch, const char* branch = "POT_Used");
+    void Merge(TChain inChain, TChain inChainTruth, TString inGlob, TString output, int run = 0);
+    double getTChainPOT(TChain& ch, const char* branch = "POT_Used");
     bool isGoodFile(const char* filename);
 };
 
 #endif
 
-MergeTool::Merge(TChain inChain, TChain inChainTruth, TString inGlob, TString output, int run){
+void MergeTool::Merge(TChain inChain, TChain inChainTruth, TString inGlob, TString output, int run){
     cout << "Filename glob is " << inGlob << endl;
     cout << "Output filename is " << output << endl;
     
