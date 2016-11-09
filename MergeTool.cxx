@@ -114,7 +114,7 @@ void MergeTool::EachRun(const char* inDirBase, const char* outDir, int run, cons
     string runStr(TString::Format("%08d", run));
     string runStrParts[4];
     for(int i=0; i<4; ++i) runStrParts[i]=runStr.substr(i*2, 2);
-    TString inGlob(TString::Format("%s/grid/central_value/minerva/ana/%s/%s/%s/%s/%s/SIM_*%s_*_%s*.root", inDirBase, minerva_release, runStrParts[0].c_str(), runStrParts[1].c_str(), runStrParts[2].c_str(), runStrParts[3].c_str(), runStr.c_str(), tag));
+    TString inGlob(TString::Format("%s/grid/central_value/minerva/ana/%s/%s/%s/%s/%s/SIM_*%s_*_%s*.root", inDirBase, minerva_release.c_str(), runStrParts[0].c_str(), runStrParts[1].c_str(), runStrParts[2].c_str(), runStrParts[3].c_str(), runStr.c_str(), tag));
 
     Merge(inChain, inChainTruth, inGlob, output, run);
 }
@@ -313,7 +313,7 @@ int main(int argc, char *argv[])
     cout << "| Analysis Tool Name (-a): " << anal_tool << endl;
     cout << "| Optional Save Name (-s): " << ana_save_name << endl;
     cout << "|--------------------------------- Running ----------------------------------" << endl;
-        
+    
     MergeTool * merger = new MergeTool();
     merger->SetMinervaRelease(minerva_release);
     
