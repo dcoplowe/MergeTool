@@ -171,81 +171,76 @@ int main(int argc, char *argv[])
 {
     char const * user_name = getenv("USER");
     if(!user_name){
-        std::cerr << "[ERROR]: environment variable \"USER\" not set. "
-        "Cannot determine source tree location." << std::endl;
-        return 1;
+        std::cout << "[WARNING]: Environment variable \"USER\" not found." << std::endl;
+        
     }
     
-    char const * anal_name = getenv("MT_ANAL");
+    char const * anal_name = getenv("ANATREE");
     if(!anal_name){
-        std::cerr << "[ERROR]: environment variable \"MT_ANAL\" not set. "
-        "Cannot determine source tree location." << std::endl;
-        return 1;
-    }
-    
-    char const * minerva_release = getenv("MINERVA_RELEASE");
-    if(!minerva_release){
-        std::cerr << "[ERROR]: environment variable \"MINERVA_RELEASE\" not set. "
-        "Cannot determine source tree location." << std::endl;
-        return 1;
+        std::cout << "[WARNING]: Environment variable \"ANATREE\" not set. To set see requirements file." << std::endl;
     }
     
     string username(user_name);
-    string analname(anal_name);
-    string minervarelease(minerva_release);
+    string anatree(anal_name);// t -- set tree
     
-    string per_dir = "/pnfs/minerva/persistent/users/" + username + "/";
-    string infile = per_dir;
-    string outfile = per_dir;
-    string treename = analname;
-    string ana_save_name = analname;
-    bool nominal = true;
-    bool full_merge = false;
-    string merge_opt;
+    string ana_save_name = "SMILE";// s -- savename
+    
+    string infile;
+    bool re_opt_i = false;
     
     string run_s;
-    int per_len = (int)strlen(per_dir.c_str());
-    
-    bool re_opt_i = false;
     bool re_opt_n = false;
     
+    string outfile;
+    bool re_opt_o = false;
+    
+    bool is_per_dir = false;
+    
     char cc;
-    while((cc = getopt(argc, argv, "i:o:f:t:h::n:a:s:m::")) != -1){
-        cout << optarg << endl;
+    while ((cc = getopt(argc, argv, "i:o:t:s:n:h::p::")) != -1) {
         switch (cc){
-            case 'i': infile += optarg; re_opt_i = true; break;
-            case 'o': outfile += optarg; break;
-            case 'f': nominal = false; break;
-            case 't': treename = optarg; break;
+            case 'i': infile = optarg;  re_opt_i = true; break;
+            case 'o': outfile = optarg; re_opt_o = true; break;
+            case 't': anatree = optarg; break;
             case 'n': run_s = optarg; re_opt_n = true; break;
-            case 'a': analname = optarg; break;
             case 's': ana_save_name = optarg; break;
-            case 'm': full_merge = true;
-                if(optarg){
-                    if (optarg[0] == '=') {memmove(optarg, optarg+1, strlen(optarg));}
-                    cout << "Contains optarg: " << optarg << endl; merge_opt = optarg;
-                } break;
+            case 'm': merge = true; break;
+            case 'p': is_per_dir = true; break;
             case 'h':
-                //cout << argv[0] << endl
-                cout << "*********************** Run Options ***********************" << endl
-                << " Default is to get and save files to the persistent drive  " << endl
-                << " however other locations can be defined using the -f option" << endl
-                << " In this case the full dir. location must be defined for   " << endl
-                << " input and output files.                                   " << endl
-                << " -i : \t Set input file dir in persistent (or full dir. " << endl
-                << "      \t excluding grid/central/... when -f is called). " << endl
-                << " -o : \t Set output file directory (or full dir. when   " << endl
-                << "      \t -f is called).                                 " << endl
-                << " -f : \t Use full paths for input and output files      " << endl
-                << " -t : \t Set name of analysis tree. Default is " << analname << endl
-                << " -n : \t Run or run range: start-end e.g 13200-13250    " << endl
-                << "      \t will run over 50 runs from 13200 to 13250.     " << endl
-                << " -a : \t Define the analysis name, defualt is " << analname <<"." << endl
-                << " -s : \t Set save name.                                 " << endl
-                << " -m : \t Merge the runs. If \"-m=merge\" is given as an " << endl
-                << "      \t arg then only the merging of runs will be done." << endl
-                << "      \t Here the input location is given by -o.        " << endl
-                << "***********************************************************" << endl;
+            //cout << argv[0] << endl
+                cout << "|*********************** Run Options ****************************|" << endl
+                << "| Default is to merge files in the root directory of your analy- |" << endl
+                << "| sis. The number of runs also needs to be defined and can be    |" << endl
+                << "| either a single run or run range (see below).                  |" << endl
+                << "|                                                                |" << endl
+                << "| Options:                                                       |" << endl
+                << "|   -i   :  Set input file dir if \"-per\" is defined only the   |" << endl
+                << "|        :  root directory of analysis in your persistent direc- |" << endl
+                << "|        :  tory is required.                                    |" << endl
+                << "|        :                                                       |" << endl
+                << "|   -n   :  Run or run range: start-end e.g 13200-13250          |" << endl
+                << "|        :  will run over 50 runs from 13200 to 13250.           |" << endl
+                << "|        :                                                       |" << endl
+                << "|   -o   :  Set output file directory.                           |" << endl
+                << "|        :                                                       |" << endl
+                << "|  -per  :  Assume in/out files are in the users persistent      |" << endl
+                << "|        :  directory. In such cases \"-i\" becomes the root     |" << endl
+                << "|        :  directory name. (e.g. -per -i CC1P1Pi_PL13C_290916   |" << endl
+                << "|        :  to merge files in /pnfs/minerva/persistent/users/    |" << endl
+                << "|        :  dcoplowe/CC1P1Pi_PL13C_290916/                       |" << endl
+                << "|        :                                                       |" << endl
+                << "|   -t   :  Set name of analysis tree.                           |"
+                << "         :  Default is currently " << analname << endl
+                << "|        :  If not set, this can be set in the PlotUtils requir- |" << endl
+                << "|        :  ements files.                                        |" << endl
+                << "|        :                                                       |" << endl
+                << "|   -s   :  Set save name.                                       |" << endl
+                << "|        :                                                       |" << endl
+                << "| -merge :  Combine runs into a single root file.                |" << endl
+                << "|        :                                                       |" << endl
+                << "| -help  :  Print this.                                          |" << endl
+                << "|        :                                                       |" << endl
+                << "|****************************************************************|" << endl;
                 return 1; break;
             default: return 1;
         }
@@ -254,29 +249,17 @@ int main(int argc, char *argv[])
     if(!(re_opt_i || re_opt_n)){
         cout << "|============ Minimum Requirements to run ============|" << endl;
         cout << "|                                                     |" << endl;
-        cout << "|    -i Set input file dir name in persistent         |" << endl;
-        cout << "|    -n Number of runs to merge                       |" << endl;
+        cout << "|    -i     Set input file dir name in persistent     |" << endl;
+        cout << "|    -n     Number of runs to merge                   |" << endl;
+        cout << "|    -help  For more options.                         |" << endl;
         cout << "|_____________________________________________________|" << endl;
         return 0;
     }
-    
-    if(!nominal){
-        TString tmp_infile = infile;
-        TString noper_infile( tmp_infile(per_len, (int)tmp_infile.Length()) );
-        infile = noper_infile.Data();
-        
-        TString tmp_outfile = outfile;
-        TString noper_outfile(tmp_outfile(per_len, (int)tmp_outfile.Length()) );
-        outfile = noper_outfile.Data();
-    }
-    
-    infile += "/grid/central_value/minerva/ana/" + minervarelease + "/";
     
     int first_run = -999;
     int last_run =  -999;
     TString run_ts = run_s;
     if(run_ts.Contains("-",TString::kExact)){
-        
         TString tmp_first( run_ts(0,run_ts.First("-")) );
         first_run = tmp_first.Atoi();
         
@@ -287,43 +270,34 @@ int main(int argc, char *argv[])
         first_run = run_ts.Atoi();
         last_run = first_run;
     }
-    
-    cout << "    Input Name: " << infile << endl;
-    cout << "   Output Name: " << outfile << endl;
-    cout << " Analysis Tree: " << treename << endl;
-    cout << " Analysis Name: " << ana_save_name << endl;
-    cout << "Merging run(s): " << run_s << endl;
-    
-    if(full_merge){
-        cout << "Full Merge Called" << endl;
+
+    if(is_per_dir){
+        string per_dir = "/pnfs/minerva/persistent/users/" + username + "/";
+        
+        string tmp_in(infile);
+        infile = per_dir + tmp_in;
+        
+        string tmp_out(outfile);
+        outfile = per_dir + tmp_out;
     }
+    
+    if(!re_opt_o) outfile = infile;
     
     MergeTool * merger = new MergeTool();
     
-    if(full_merge){
-        if(merge_opt == "merge"){
+    if(merge){
             cout<< "Only merging merged runs" << endl;
-            merger->AllRuns(outfile.c_str(), analname.c_str(), treename.c_str(), ana_save_name.c_str());
-        }
-        else{
-            cout << "Merging sub-runs for each run and then merging runs" << endl;
-            for(int i=first_run; i < last_run + 1; i++){
-                cout << "Merging Run " << i << endl;
-                merger->EachRun(infile.c_str(), outfile.c_str(), i, analname.c_str(), treename.c_str(), ana_save_name.c_str());
-            }
-            merger->AllRuns(outfile.c_str(), analname.c_str(), treename.c_str(), ana_save_name.c_str());
-        }
-        
+            merger->AllRuns(infile.c_str(), analname.c_str(), anatree.c_str(), ana_save_name.c_str());
     }
     else{
+        cout << "Merging sub-runs for each run and then merging runs" << endl;
         for(int i=first_run; i < last_run + 1; i++){
             cout << "Merging Run " << i << endl;
-            merger->EachRun(infile.c_str(), outfile.c_str(), i, analname.c_str(), treename.c_str(), ana_save_name.c_str());
+            merger->EachRun(infile.c_str(), outfile.c_str(), i, analname.c_str(), anatree.c_str(), ana_save_name.c_str());
         }
-        
     }
     
     delete merger;
-    cout << "File Merge Finished" << endl;
+    cout << "Finished merging files." << endl;
     return 0;
 }
