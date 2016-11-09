@@ -196,6 +196,8 @@ int main(int argc, char *argv[])
     
     bool is_per_dir = false;
     
+    bool merge = false;
+    
     char cc;
     while ((cc = getopt(argc, argv, "i:o:t:s:n:h::p::")) != -1) {
         switch (cc){
