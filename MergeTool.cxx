@@ -175,19 +175,19 @@ int main(int argc, char *argv[])
         
     }
     
-    char const * anal_name = getenv("ANATREENAME");
-    if(!anal_name){
+    char const * anal_tree = getenv("ANATREENAME");
+    if(!anal_tree){
         std::cout << "[WARNING]: Environment variable \"ANATREE\" not set. To set see requirements file." << std::endl;
     }
     
-    char const * analtool_name = getenv("ANATREENAME");
-    if(!analtool_name){
+    char const * anal_tool = getenv("ANATREENAME");
+    if(!anal_tool){
         std::cout << "[WARNING]: Environment variable \"ANATREENAME\" not set. To set see requirements file." << std::endl;
     }
     
     string username(user_name);
-    string anatree(anal_name);// t -- set tree
-    string ananame(analtool_name);
+    string anatree(anal_tree);// t -- set tree
+    string analtool(anal_tool);
     
     string ana_save_name = "SMILE";// s -- savename
     
@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
                 << "|        :  dcoplowe/CC1P1Pi_PL13C_290916/                       |" << endl
                 << "|        :                                                       |" << endl
                 << "|   -t   :  Set name of analysis tree.                           |"
-                << "         :  Default is currently " << analname << endl
+                << "         :  Default is currently " << analtool << endl
                 << "|        :  If not set, this can be set in the PlotUtils requir- |" << endl
                 << "|        :  ements files.                                        |" << endl
                 << "|        :                                                       |" << endl
@@ -295,13 +295,13 @@ int main(int argc, char *argv[])
     
     if(merge){
             cout<< "Only merging merged runs" << endl;
-            merger->AllRuns(infile.c_str(), analname.c_str(), anatree.c_str(), ana_save_name.c_str());
+            merger->AllRuns(infile.c_str(), analtool.c_str(), anatree.c_str(), ana_save_name.c_str());
     }
     else{
         cout << "Merging sub-runs for each run and then merging runs" << endl;
         for(int i=first_run; i < last_run + 1; i++){
             cout << "Merging Run " << i << endl;
-            merger->EachRun(infile.c_str(), outfile.c_str(), i, analname.c_str(), anatree.c_str(), ana_save_name.c_str());
+            merger->EachRun(infile.c_str(), outfile.c_str(), i, analtool.c_str(), anatree.c_str(), ana_save_name.c_str());
         }
     }
     
