@@ -30,7 +30,7 @@ public:
     void AllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
     
 private:
-    void Merge(TChain inChain, TChain inChainTruth, TString inGlob, TString output, int run = 0);
+    void Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TString output, int run = 0);
     double getTChainPOT(TChain& ch, const char* branch = "POT_Used");
     bool isGoodFile(const char* filename);
 };
