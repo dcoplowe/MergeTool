@@ -29,7 +29,7 @@ public:
     void EachRun(const char* inDirBase, const char* outDir, int run, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
     void AllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
     
-    void SetMinervaRelease(const char * var){ minerva_release(var); }
+    void SetMinervaRelease(char const * var){ minerva_release(var); }
     
 private:
     void Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TString output, int run = 0);
