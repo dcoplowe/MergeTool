@@ -29,7 +29,7 @@ public:
     void EachRun(const char* inDirBase, const char* outDir, int run, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
     void AllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
     
-    void SetMinervaRelease(char const * var){ minerva_release(var); }
+    void SetMinervaRelease(char const * var){ minerva_release = string(var); }
     
 private:
     void Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TString output, int run = 0);
@@ -107,7 +107,7 @@ void MergeTool::Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TSt
 
 void MergeTool::EachRun(const char* inDirBase, const char* outDir, int run, const char* tag, const char* treeName, const char* save_name){
     
-    TString output=TString::Format("%s/merged_%s_%s_run%08d.root", outDir, minerva_, tag, save_name, run);
+    TString output=TString::Format("%s/merged_%s_%s_run%08d.root", outDir, tag, save_name, run);
     TChain inChain(treeName);
     TChain inChainTruth("Truth");
     
