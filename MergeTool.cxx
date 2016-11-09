@@ -10,11 +10,14 @@
 #include "TStopwatch.h"
 #include "TSystem.h"
 #include "TList.h"
-
 #include <iostream>
 #include <string>
 #include <cassert>
 #include <stdlib.h>
+
+#ifndef __CINT__
+#include "glob.h"
+#endif
 
 using namespace std;
 
