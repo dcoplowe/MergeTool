@@ -102,7 +102,7 @@ void MergeTool::Merge(TChain inChain, TChain inChainTruth, TString inGlob, TStri
 }
 
 
-void MergeTool::EachRun(const char* inDirBase, const char* outDir, int run, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = ""){
+void MergeTool::EachRun(const char* inDirBase, const char* outDir, int run, const char* tag, const char* treeName, const char* save_name){
     
     TString output=TString::Format("%s/merged_%s_%s_run%08d.root", outDir, tag, save_name, run);
     TChain inChain(treeName);
@@ -116,7 +116,7 @@ void MergeTool::EachRun(const char* inDirBase, const char* outDir, int run, cons
     Merge(inChain, inChainTruth, inGlob, output, run);
 }
 
-void MergeTool::AllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = ""){
+void MergeTool::AllRuns(const char* outDir, const char* tag, const char* treeName, const char* save_name){
     
     TString output=TString::Format("%s/%s_Full.root", outDir, save_name);
     
