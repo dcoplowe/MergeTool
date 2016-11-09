@@ -183,9 +183,9 @@ int main(int argc, char *argv[])
         std::cout << "[WARNING]: Environment variable \"ANATREE\" not set. To set see requirements file." << std::endl;
     }
     
-    char const * anal_tool = getenv("ANATREENAME");
+    char const * anal_tool = getenv("ANATOOLNAME");
     if(!anal_tool){
-        std::cout << "[WARNING]: Environment variable \"ANATREENAME\" not set. To set see requirements file." << std::endl;
+        std::cout << "[WARNING]: Environment variable \"ANATOOLNAME\" not set. To set see requirements file." << std::endl;
     }
     
     char const * minerva_release = getenv("MINERVA_RELEASE");
@@ -215,7 +215,7 @@ int main(int argc, char *argv[])
     bool merge = false;
     
     char cc;
-    while ((cc = getopt(argc, argv, "i:o:t:s:n:h::p::")) != -1) {
+    while ((cc = getopt(argc, argv, "i:o:t:s:n:h:p:a:")) != -1) {
         switch (cc){
             case 'i': infile = optarg;  re_opt_i = true; break;
             case 'o': outfile = optarg; re_opt_o = true; break;
@@ -224,6 +224,7 @@ int main(int argc, char *argv[])
             case 's': ana_save_name = optarg; break;
             case 'm': merge = true; break;
             case 'p': is_per_dir = true; break;
+            case 'a': analtool = optarg; break;
             case 'h':
             //cout << argv[0] << endl
                 cout << "|*********************** Run Options ****************************|" << endl
