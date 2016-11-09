@@ -37,7 +37,7 @@ private:
 
 #endif
 
-void MergeTool::Merge(TChain inChain, TChain inChainTruth, TString inGlob, TString output, int run){
+void MergeTool::Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TString output, int run){
     cout << "Filename glob is " << inGlob << endl;
     cout << "Output filename is " << output << endl;
     
