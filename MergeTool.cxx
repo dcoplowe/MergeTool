@@ -215,7 +215,7 @@ int main(int argc, char *argv[])
     bool merge = false;
     
     char cc;
-    while ((cc = getopt(argc, argv, "i:o:t:s:n:h:p:a:")) != -1) {
+    while ((cc = getopt(argc, argv, "i:o:t:s:n:h:p:a:m:")) != -1) {
         switch (cc){
             case 'i': infile = optarg;  re_opt_i = true; break;
             case 'o': outfile = optarg; re_opt_o = true; break;
