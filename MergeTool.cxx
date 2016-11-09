@@ -29,10 +29,13 @@ public:
     void EachRun(const char* inDirBase, const char* outDir, int run, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
     void AllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
     
+    void SetMinervaRelease(const char * var){ minerva_release(var); }
+    
 private:
     void Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TString output, int run = 0);
     double getTChainPOT(TChain& ch, const char* branch = "POT_Used");
     bool isGoodFile(const char* filename);
+    string minerva_release;
 };
 
 #endif
@@ -104,14 +107,14 @@ void MergeTool::Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TSt
 
 void MergeTool::EachRun(const char* inDirBase, const char* outDir, int run, const char* tag, const char* treeName, const char* save_name){
     
-    TString output=TString::Format("%s/merged_%s_%s_run%08d.root", outDir, tag, save_name, run);
+    TString output=TString::Format("%s/merged_%s_%s_run%08d.root", outDir, minerva_, tag, save_name, run);
     TChain inChain(treeName);
     TChain inChainTruth("Truth");
     
     string runStr(TString::Format("%08d", run));
     string runStrParts[4];
     for(int i=0; i<4; ++i) runStrParts[i]=runStr.substr(i*2, 2);
-    TString inGlob(TString::Format("%s/%s/%s/%s/%s/SIM_*%s_*_%s*.root", inDirBase, runStrParts[0].c_str(), runStrParts[1].c_str(), runStrParts[2].c_str(), runStrParts[3].c_str(), runStr.c_str(), tag));
+    TString inGlob(TString::Format("%s/grid/central_value/minerva/ana/%s/%s/%s/%s/%s/SIM_*%s_*_%s*.root", inDirBase, minerva_release, runStrParts[0].c_str(), runStrParts[1].c_str(), runStrParts[2].c_str(), runStrParts[3].c_str(), runStr.c_str(), tag));
 
     Merge(inChain, inChainTruth, inGlob, output, run);
 }
@@ -183,6 +186,13 @@ int main(int argc, char *argv[])
     char const * anal_tool = getenv("ANATREENAME");
     if(!anal_tool){
         std::cout << "[WARNING]: Environment variable \"ANATREENAME\" not set. To set see requirements file." << std::endl;
+    }
+    
+    char const * minerva_release = getenv("MINERVA_RELEASE");
+    if(!minerva_release){
+        std::cerr << "[ERROR]: environment variable \"MINERVA_RELEASE\" not set. "
+        "Cannot determine source tree location." << std::endl;
+        return 1;
     }
     
     string username(user_name);
@@ -291,7 +301,21 @@ int main(int argc, char *argv[])
     
     if(!re_opt_o) outfile = infile;
     
+    cout << "|---------------------------------- Inputs ----------------------------------" << endl;
+    if(merge || is_per_dir) cout << "| Option(s) called: " << endl;
+    if(is_per_dir) cout << "|                   (-per)   In/out files are in persistent." << endl;
+    if(merge) cout << "|                   (-merge) Merge the merged run files." << endl;
+    
+    cout << "| Input  (-i): " << infile << endl;
+    cout << "| N Runs (-n): " << run_s << endl;
+    cout << "| Output (-o): " << outfile << endl;
+    cout << "| Analysis Tree Name (-t): " << anal_tree << endl;
+    cout << "| Analysis Tool Name (-a): " << anal_tool << endl;
+    cout << "| Optional Save Name (-s): " << ana_save_name << endl;
+    cout << "|--------------------------------- Running ----------------------------------" << endl;
+        
     MergeTool * merger = new MergeTool();
+    merger->SetMinervaRelease(minerva_release);
     
     if(merge){
             cout<< "Only merging merged runs" << endl;
