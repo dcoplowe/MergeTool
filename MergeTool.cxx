@@ -102,6 +102,8 @@ void MergeTool::Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TSt
     ts.Stop();
     cout << "Merging time:" << endl;
     ts.Print();
+    
+    fout->Close();
 }
 
 
