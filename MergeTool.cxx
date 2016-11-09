@@ -1,6 +1,23 @@
 #ifndef _MERGETOOL_
 #define _MERGETOOL_
 
+#include "TString.h"
+#include "TChain.h"
+#include "TChainElement.h"
+#include "TFile.h"
+#include "TBranch.h"
+#include "TLeaf.h"
+#include "TStopwatch.h"
+#include "TSystem.h"
+#include "TList.h"
+
+#include <iostream>
+#include <string>
+#include <cassert>
+#include <stdlib.h>
+
+using namespace std;
+
 class MergeTool {
 public:
     MergeTool(){};
