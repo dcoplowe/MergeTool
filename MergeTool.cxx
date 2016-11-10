@@ -333,6 +333,6 @@ int main(int argc, char *argv[])
     }
     
     delete merger;
-    cout << "Finished merging files." << endl;
+    cout << "|-------------------------- Finished merging files --------------------------" << endl;
     return 0;
 }
