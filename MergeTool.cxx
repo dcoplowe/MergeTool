@@ -235,7 +235,7 @@ int main(int argc, char *argv[])
                 << "| either a single run or run range (see below).                  |" << endl
                 << "|                                                                |" << endl
                 << "| Options:                                                       |" << endl
-                << "|   -i   :  Set input file dir if \"-per\" is defined only the   |" << endl
+                << "|   -i   :  Set input file dir if \"-per\" is defined only the     |" << endl
                 << "|        :  root directory of analysis in your persistent direc- |" << endl
                 << "|        :  tory is required.                                    |" << endl
                 << "|        :                                                       |" << endl
@@ -245,13 +245,17 @@ int main(int argc, char *argv[])
                 << "|   -o   :  Set output file directory.                           |" << endl
                 << "|        :                                                       |" << endl
                 << "|  -per  :  Assume in/out files are in the users persistent      |" << endl
-                << "|        :  directory. In such cases \"-i\" becomes the root     |" << endl
+                << "|        :  directory. In such cases \"-i\" becomes the root       |" << endl
                 << "|        :  directory name. (e.g. -per -i CC1P1Pi_PL13C_290916   |" << endl
                 << "|        :  to merge files in /pnfs/minerva/persistent/users/    |" << endl
                 << "|        :  dcoplowe/CC1P1Pi_PL13C_290916/                       |" << endl
                 << "|        :                                                       |" << endl
-                << "|   -t   :  Set name of analysis tree.                           |"
+                << "|   -a   :  Analysis tool name (Your analysis tool used to make  |" << endl
+                << "|        :  the root files you want to merge)                    |" << endl
                 << "         :  Default is currently " << analtool << endl
+                << "|        :                                                       |" << endl
+                << "|   -t   :  Set name of analysis tree.                           |" << endl
+                << "         :  Default is currently " << anatree << endl
                 << "|        :  If not set, this can be set in the PlotUtils requir- |" << endl
                 << "|        :  ements files.                                        |" << endl
                 << "|        :                                                       |" << endl
