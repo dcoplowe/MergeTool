@@ -274,7 +274,7 @@ int main(int argc, char *argv[])
     if(!(re_opt_i || re_opt_n)){
         cout << "|============ Minimum Requirements to run ============|" << endl;
         cout << "|                                                     |" << endl;
-        cout << "|    -i     Set input file dir name in persistent     |" << endl;
+        cout << "|    -i     Set input file dir name                   |" << endl;
         cout << "|    -n     Number of runs to merge                   |" << endl;
         cout << "|    -help  For more options.                         |" << endl;
         cout << "|_____________________________________________________|" << endl;
