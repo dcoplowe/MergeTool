@@ -174,7 +174,7 @@ bool MergeTool::isGoodFile(const char* filename)
     return true;
 }
 
-bool MergTool::GoodMetaData(const char* filename){
+bool MergeTool::GoodMetaData(const char* filename){
     
     if(!m_checkmeta) return true;
     
