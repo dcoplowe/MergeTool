@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
             case 'm': merge = true; break;
             case 'p': is_per_dir = true; break;
             case 'a': analtool = optarg; break;
-            case 'c': meta_data_check = false;
+            case 'c': meta_data_check = false; break;
             case 'h':
             //cout << argv[0] << endl
                 cout << "|*********************** Run Options ****************************|" << endl
