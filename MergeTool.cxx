@@ -30,11 +30,14 @@ public:
     void AllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
     
     void SetMinervaRelease(char const * var){ minerva_release = string(var); }
+    void CheckMetaData(bool var){ m_checkmeta = var; }
     
 private:
     void Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TString output, int run = 0);
     double getTChainPOT(TChain& ch, const char* branch = "POT_Used");
     bool isGoodFile(const char* filename);
+    bool m_checkmeta;
+    bool GoodMetaData(const char* filename);
     string minerva_release;
 };
 
@@ -53,7 +56,7 @@ void MergeTool::Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TSt
     for(int i=0; i<(int)g.gl_pathc; ++i){
         if(i%100==0) cout << i << " " << flush;
         const char* filename=g.gl_pathv[i];
-        if(isGoodFile(filename)){
+        if(isGoodFile(filename) && GoodMetaData(filename)){
             inChain.Add(filename);
             inChainTruth.Add(filename);
             ++nFiles;
@@ -69,7 +72,7 @@ void MergeTool::Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TSt
     double sumPOTTotal=getTChainPOT(inChainTruth, "POT_Total");
     int nFilesTotal=g.gl_pathc;
     cout << "Added " << nFiles << " files out of " << nFilesTotal << " in run " << run << endl;
-    cout << "POT totals: Total=" << sumPOTTotal << " Used=" << sumPOTUsed << endl;
+    cout << "POT totals: Total = " << sumPOTTotal << " Used = " << sumPOTUsed << endl;
     globfree(&g);
     
     if(nFiles==0){
@@ -93,7 +96,7 @@ void MergeTool::Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TSt
     // inChainTruth.Merge(fout, 32000, "keep SortBasketsByBranch");
     
     fout->cd();
-    TTree* newMetaTree=new TTree("Meta", "Titles are stupid");
+    TTree* newMetaTree=new TTree("Meta", "");
     newMetaTree->Branch("POT_Used", &sumPOTUsed);
     newMetaTree->Branch("POT_Total", &sumPOTTotal);
     //if(!mc) newMetaTree->Branch("POT_Unanalyzable", &sumPOTUnanalyzable);
@@ -171,6 +174,18 @@ bool MergeTool::isGoodFile(const char* filename)
     return true;
 }
 
+bool MergTool::GoodMetaData(const char* filename){
+    
+    if(!m_checkmeta) return true;
+    
+    TFile f(filename);
+    if(f.IsZombie()) return false;
+    TTree* meta=(TTree*)f.Get("Meta");
+    if(!meta) return false;
+    if(meta->GetEntriesFast() == 0) return false;
+    if(!meta->GetBranch("POT_Used")) return false;
+    return true;
+}
 
 int main(int argc, char *argv[])
 {
@@ -216,8 +231,10 @@ int main(int argc, char *argv[])
     
     bool merge = false;
     
+    bool meta_data_check = true;
+    
     char cc;
-    while ((cc = getopt(argc, argv, "i:o:t:s:n:h:p:a:m:")) != -1) {
+    while ((cc = getopt(argc, argv, "i:o:t:s:n:h:p:a:m:c:")) != -1) {
         switch (cc){
             case 'i': infile = optarg;  re_opt_i = true; break;
             case 'o': outfile = optarg; re_opt_o = true; break;
@@ -227,6 +244,7 @@ int main(int argc, char *argv[])
             case 'm': merge = true; break;
             case 'p': is_per_dir = true; break;
             case 'a': analtool = optarg; break;
+            case 'c': meta_data_check = false;
             case 'h':
             //cout << argv[0] << endl
                 cout << "|*********************** Run Options ****************************|" << endl
@@ -262,6 +280,9 @@ int main(int argc, char *argv[])
                 << "|   -s   :  Set save name.                                       |" << endl
                 << "|        :                                                       |" << endl
                 << "| -merge :  Combine runs into a single root file.                |" << endl
+                << "|        :                                                       |" << endl
+                << "| -check :  Merge without checking POT in Meta tree is good      |" << endl
+                << "|        :  (exists).                                            |" << endl
                 << "|        :                                                       |" << endl
                 << "| -help  :  Print this.                                          |" << endl
                 << "|        :                                                       |" << endl
@@ -312,7 +333,7 @@ int main(int argc, char *argv[])
     if(merge || is_per_dir) cout << "| Option(s) called: " << endl;
     if(is_per_dir) cout << "|                   (-per)   In/out files are in persistent." << endl;
     if(merge) cout << "|                   (-merge) Merge the merged run files." << endl;
-    
+    if(meta_data_check) cout << "|                   Checking POT info is good. (Switch off using -check)" << endl;
     cout << "| Input  (-i): " << infile << endl;
     cout << "| N Runs (-n): " << run_s << endl;
     cout << "| Output (-o): " << outfile << endl;
@@ -322,6 +343,7 @@ int main(int argc, char *argv[])
     cout << "|--------------------------------- Running ----------------------------------" << endl;
     
     MergeTool * merger = new MergeTool();
+    merger->CheckMetaData(meta_data_check);
     merger->SetMinervaRelease(minerva_release);
     
     if(merge){
