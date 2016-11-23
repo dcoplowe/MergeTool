@@ -23,7 +23,7 @@ using namespace std;
 
 class MergeTool {
 public:
-    MergeTool(){};
+    MergeTool() : m_realdata(false), m_fullpath(false), m_checkmeta(true) {};
     ~MergeTool(){};
     
     void EachRun(const char* inDirBase, const char* outDir, int run, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
@@ -31,6 +31,8 @@ public:
     
     void SetMinervaRelease(char const * var){ minerva_release = string(var); }
     void CheckMetaData(bool var){ m_checkmeta = var; }
+    void IsRealData(bool var){ m_realdata = var; }
+    void FullPath(bool var){ m_fullpath = var; }
     
 private:
     void Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TString output, int run = 0);
@@ -39,6 +41,8 @@ private:
     bool m_checkmeta;
     bool GoodMetaData(const char* filename);
     string minerva_release;
+    bool m_realdata;
+    bool m_fullpath;
 };
 
 #endif
@@ -46,6 +50,8 @@ private:
 void MergeTool::Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TString output, int run){
     cout << "Filename glob is " << inGlob << endl;
     cout << "Output filename is " << output << endl;
+    
+    //Set boolians in initialisation:
     
     glob_t g;
     glob(inGlob.Data(), 0, 0, &g);
@@ -58,7 +64,8 @@ void MergeTool::Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TSt
         const char* filename=g.gl_pathv[i];
         if(isGoodFile(filename) && GoodMetaData(filename)){
             inChain.Add(filename);
-            inChainTruth.Add(filename);
+            if(!m_realdata) inChainTruth.Add(filename);
+            //else inChain
             ++nFiles;
         }
         else{
@@ -68,8 +75,19 @@ void MergeTool::Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TSt
     cout << endl;
     
     // For summing up the POT totals from the Meta tree
-    double sumPOTUsed=getTChainPOT(inChainTruth, "POT_Used");
-    double sumPOTTotal=getTChainPOT(inChainTruth, "POT_Total");
+    
+//    double sumPOTUsed = 0.;=getTChainPOT(inChainTruth, "POT_Used");
+//    double sumPOTTotal = 0.;
+    
+//    if(!m_realdata){
+    double sumPOTUsed  = getTChainPOT(inChain, "POT_Used");
+    double sumPOTTotal = getTChainPOT(inChain, "POT_Total");
+//    }
+    //else{
+    //    sumPOTUsed  = getTChainPOT(inChainTruth, "POT_Used");
+    //    sumPOTTotal = getTChainPOT(inChainTruth, "POT_Total");
+    //}
+    
     int nFilesTotal=g.gl_pathc;
     cout << "Added " << nFiles << " files out of " << nFilesTotal << " in run " << run << endl;
     cout << "POT totals: Total = " << sumPOTTotal << " Used = " << sumPOTUsed << endl;
@@ -87,12 +105,13 @@ void MergeTool::Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TSt
     fout->cd(); // Just in case the surrounding lines get separated
     inChain.Merge(fout, 32000, "keep SortBasketsByBranch");
     
+    if(!m_realdata){
     cout << "Merging truth tree" << endl;
     //setBranchStatuses(inChainTruth);
     fout->cd();
     TTree* outTreeTruth=inChainTruth.CopyTree("");
     outTreeTruth->Write();
-    
+    }
     // inChainTruth.Merge(fout, 32000, "keep SortBasketsByBranch");
     
     fout->cd();
@@ -119,7 +138,12 @@ void MergeTool::EachRun(const char* inDirBase, const char* outDir, int run, cons
     string runStr(TString::Format("%08d", run));
     string runStrParts[4];
     for(int i=0; i<4; ++i) runStrParts[i]=runStr.substr(i*2, 2);
-    TString inGlob(TString::Format("%s/grid/central_value/minerva/ana/%s/%s/%s/%s/%s/SIM_*%s_*_%s*.root", inDirBase, minerva_release.c_str(), runStrParts[0].c_str(), runStrParts[1].c_str(), runStrParts[2].c_str(), runStrParts[3].c_str(), runStr.c_str(), tag));
+    
+    string subpath;
+    if(!m_fullpath) subpath = "grid/central_value/minerva/ana/";
+    else subpath = "";
+    
+    TString inGlob(TString::Format("%s/%s%s/%s/%s/%s/%s/SIM_*%s_*_%s*.root", inDirBase, subpath.c_str(), minerva_release.c_str(), runStrParts[0].c_str(), runStrParts[1].c_str(), runStrParts[2].c_str(), runStrParts[3].c_str(), runStr.c_str(), tag));
 
     Merge(inChain, inChainTruth, inGlob, output, run);
 }
@@ -170,7 +194,7 @@ bool MergeTool::isGoodFile(const char* filename)
     if(!meta) return false;
     if(!meta->GetBranch("POT_Total")) return false;
     if(!meta->GetBranch("POT_Used")) return false;
-    if(!f.Get("Truth")) return false;
+    if(!m_realdata && !f.Get("Truth")) return false;//Check this.
     return true;
 }
 
@@ -233,8 +257,12 @@ int main(int argc, char *argv[])
     
     bool meta_data_check = true;
     
+    bool real_data = false;
+    
+    bool full_path = false;
+    
     char cc;
-    while ((cc = getopt(argc, argv, "i:o:t:s:n:h:p:a:m:c:")) != -1) {
+    while ((cc = getopt(argc, argv, "i:o:t:s:n:h:p:a:m:c:r:f:")) != -1) {
         switch (cc){
             case 'i': infile = optarg;  re_opt_i = true; break;
             case 'o': outfile = optarg; re_opt_o = true; break;
@@ -245,6 +273,8 @@ int main(int argc, char *argv[])
             case 'p': is_per_dir = true; break;
             case 'a': analtool = optarg; break;
             case 'c': meta_data_check = false; break;
+            case 'r': real_data = true; break;
+            case 'f': full_path = true; break;
             case 'h':
             //cout << argv[0] << endl
                 cout << "|*********************** Run Options ****************************|" << endl
@@ -283,6 +313,14 @@ int main(int argc, char *argv[])
                 << "|        :                                                       |" << endl
                 << "| -check :  Merge without checking POT in Meta tree is good      |" << endl
                 << "|        :  (exists).                                            |" << endl
+                << "|        :                                                       |" << endl
+                << "| -real  :  Run on a real data file (merge without Truth tree).  |" << endl
+                << "|        :                                                       |" << endl
+                << "| -full  :  Add full directory path. This enables you to merge   |" << endl
+                << "|        :  special runs where the sub directories are not       |" << endl
+                << "|        :  grid/central_value/minerva/ana. When \"-full\" is    |" << endl
+                << "|        :  defined simply set the full path up to and including |" << endl
+                << "|        :  ana using \"-i\".                                    |" << endl
                 << "|        :                                                       |" << endl
                 << "| -help  :  Print this.                                          |" << endl
                 << "|        :                                                       |" << endl
@@ -345,6 +383,8 @@ int main(int argc, char *argv[])
     MergeTool * merger = new MergeTool();
     merger->CheckMetaData(meta_data_check);
     merger->SetMinervaRelease(minerva_release);
+    merger->IsRealData(real_data);
+    merger->FullPath(full_path);
     
     if(merge){
             cout<< "Only merging merged runs" << endl;
