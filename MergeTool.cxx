@@ -318,9 +318,9 @@ int main(int argc, char *argv[])
                 << "|        :                                                       |" << endl
                 << "| -full  :  Add full directory path. This enables you to merge   |" << endl
                 << "|        :  special runs where the sub directories are not       |" << endl
-                << "|        :  grid/central_value/minerva/ana. When \"-full\" is    |" << endl
+                << "|        :  grid/central_value/minerva/ana. When \"-full\" is      |" << endl
                 << "|        :  defined simply set the full path up to and including |" << endl
-                << "|        :  ana using \"-i\".                                    |" << endl
+                << "|        :  ana using \"-i\".                                      |" << endl
                 << "|        :                                                       |" << endl
                 << "| -help  :  Print this.                                          |" << endl
                 << "|        :                                                       |" << endl
@@ -368,10 +368,12 @@ int main(int argc, char *argv[])
     if(!re_opt_o) outfile = infile;
     
     cout << "|---------------------------------- Inputs ----------------------------------" << endl;
-    if(merge || is_per_dir) cout << "| Option(s) called: " << endl;
+    if(meta_data_check) cout << "|                   Checking POT info is good. (Switch off using -check)" << endl;
+    if(merge || is_per_dir || full_path || real_data) cout << "| Option(s) called: " << endl;
     if(is_per_dir) cout << "|                   (-per)   In/out files are in persistent." << endl;
     if(merge) cout << "|                   (-merge) Merge the merged run files." << endl;
-    if(meta_data_check) cout << "|                   Checking POT info is good. (Switch off using -check)" << endl;
+    if(real_data) cout << "|                   (-real) Merging real data files." << endl;
+    if(full_path) cout << "|                   (-full) User defining full path." << endl;
     cout << "| Input  (-i): " << infile << endl;
     cout << "| N Runs (-n): " << run_s << endl;
     cout << "| Output (-o): " << outfile << endl;
