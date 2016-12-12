@@ -174,7 +174,7 @@ void MergeTool::AllRuns(const char* outDir, const char* tag, const char* treeNam
     Merge(inChain, inChainTruth, inGlob, output);
 }
 
-void SingleMerge(const char* inDirBase, const char* outDir, const char* tag, const char* treeName, const char* save_name, int first_run, int last_run){
+void MergeTool::SingleMerge(const char* inDirBase, const char* outDir, const char* tag, const char* treeName, const char* save_name, int first_run, int last_run){
     
     TString output=TString::Format("%s/merged_%s_%s_run%08d-%08d.root", outDir, tag, save_name, first_run, last_run);
     TChain inChain(treeName);
