@@ -27,7 +27,7 @@ public:
     ~MergeTool(){};
     
     void EachRun(const char* inDirBase, const char* outDir, int run, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
-    void SingleMerge(const char* inDirBase, const char* outDir, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "", int first_run, int last_run);
+    void SingleMerge(const char* inDirBase, const char* outDir, int first_run, int last_run, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
     void AllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
 
     void SetMinervaRelease(char const * var){ minerva_release = string(var); }
@@ -174,7 +174,7 @@ void MergeTool::AllRuns(const char* outDir, const char* tag, const char* treeNam
     Merge(inChain, inChainTruth, inGlob, output);
 }
 
-void MergeTool::SingleMerge(const char* inDirBase, const char* outDir, const char* tag, const char* treeName, const char* save_name, int first_run, int last_run){
+void MergeTool::SingleMerge(const char* inDirBase, const char* outDir, int first_run, int last_run, const char* tag, const char* treeName, const char* save_name){
     
     TString output=TString::Format("%s/merged_%s_%s_run%08d-%08d.root", outDir, tag, save_name, first_run, last_run);
     TChain inChain(treeName);
@@ -546,7 +546,7 @@ int main(int argc, char *argv[])
     }
     else{
         cout << "Merging sub-runs for each run into a single root file" << endl;
-        merger->SingleMerge(infile.c_str(), outfile.c_str(), analtool.c_str(), anatree.c_str(), ana_save_name.c_str(), first_run, last_run);
+        merger->SingleMerge(infile.c_str(), outfile.c_str(), first_run, last_run, analtool.c_str(), anatree.c_str(), ana_save_name.c_str());
     }
     
     delete merger;
