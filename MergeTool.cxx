@@ -534,11 +534,11 @@ int main(int argc, char *argv[])
     merger->IsRealData(real_data);
     merger->FullPath(full_path);
     
-    if(merge = 2){
+    if(merge == 2){
             cout<< "Only merging merged runs" << endl;
             merger->AllRuns(infile.c_str(), analtool.c_str(), anatree.c_str(), ana_save_name.c_str());
     }
-    else if(merge = 1){
+    else if(merge == 1){
         cout << "Merging sub-runs for each run" << endl;
         for(int i=first_run; i < last_run + 1; i++){
             cout << "Merging Run " << i << endl;
