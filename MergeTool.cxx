@@ -224,6 +224,8 @@ void MergeTool::SingleMerge(const char* inDirBase, const char* outDir, int first
                 cout << "Skipping " << filename << endl;
             }
         }
+        globfree(&g);
+
         cout << endl;
     }
     
@@ -243,7 +245,6 @@ void MergeTool::SingleMerge(const char* inDirBase, const char* outDir, int first
     
     cout << "Added " << nFiles << " files out of " << nFilesTotal << endl;
     cout << "POT totals: Total = " << sumPOTTotal << " Used = " << sumPOTUsed << endl;
-    globfree(&g);
     
     if(nFiles==0){
         cout << "No files added, nothing to do..." << endl;
