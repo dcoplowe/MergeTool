@@ -13,7 +13,7 @@
 #include <iostream>
 #include <string>
 #include <cassert>
-#include <stdlib.h>
+#include <stdlib.h>// or cstdlib is c++
 
 #ifndef __CINT__
 #include "glob.h"
@@ -27,27 +27,28 @@ public:
     ~MergeTool(){};
     
     void EachRun(const char* inDirBase, const char* outDir, int run, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
+    void SingleMerge(const char* inDirBase, const char* outDir, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "", int first_run, int last_run);
     void AllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
-    
+
     void SetMinervaRelease(char const * var){ minerva_release = string(var); }
     void CheckMetaData(bool var){ m_checkmeta = var; }
     void IsRealData(bool var){ m_realdata = var; }
     void FullPath(bool var){ m_fullpath = var; }
     
 private:
-    void Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TString output, int run = 0);
+    void Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TString output);
     double getTChainPOT(TChain& ch, const char* branch = "POT_Used");
     bool isGoodFile(const char* filename);
-    bool m_checkmeta;
     bool GoodMetaData(const char* filename);
     string minerva_release;
     bool m_realdata;
     bool m_fullpath;
+    bool m_checkmeta;
 };
 
 #endif
 
-void MergeTool::Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TString output, int run){
+void MergeTool::Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TString output){
     cout << "Filename glob is " << inGlob << endl;
     cout << "Output filename is " << output << endl;
     
@@ -89,7 +90,7 @@ void MergeTool::Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TSt
     //}
     
     int nFilesTotal=g.gl_pathc;
-    cout << "Added " << nFiles << " files out of " << nFilesTotal << " in run " << run << endl;
+    cout << "Added " << nFiles << " files out of " << nFilesTotal << endl;
     cout << "POT totals: Total = " << sumPOTTotal << " Used = " << sumPOTUsed << endl;
     globfree(&g);
     
@@ -143,9 +144,19 @@ void MergeTool::EachRun(const char* inDirBase, const char* outDir, int run, cons
     if(!m_fullpath) subpath = "grid/central_value/minerva/ana/";
     else subpath = "";
     
-    TString inGlob(TString::Format("%s/%s%s/%s/%s/%s/%s/SIM_*%s_*_%s*.root", inDirBase, subpath.c_str(), minerva_release.c_str(), runStrParts[0].c_str(), runStrParts[1].c_str(), runStrParts[2].c_str(), runStrParts[3].c_str(), runStr.c_str(), tag));
+    TString inGlob(TString::Format("%s/%s%s/%s/%s/%s/%s/%s_*%s_*_%s*.root",
+                                   inDirBase,
+                                   subpath.c_str(),
+                                   minerva_release.c_str(),
+                                   runStrParts[0].c_str(),
+                                   runStrParts[1].c_str(),
+                                   runStrParts[2].c_str(),
+                                   runStrParts[3].c_str(),
+                                   m_realdata ? "MV" : "SIM",
+                                   runStr.c_str(),
+                                   tag));
 
-    Merge(inChain, inChainTruth, inGlob, output, run);
+    Merge(inChain, inChainTruth, inGlob, output);
 }
 
 void MergeTool::AllRuns(const char* outDir, const char* tag, const char* treeName, const char* save_name){
@@ -161,6 +172,114 @@ void MergeTool::AllRuns(const char* outDir, const char* tag, const char* treeNam
     TString inGlob(TString::Format("%s/merged_%s_%s_run*.root",outDir, tag, save_name));
     
     Merge(inChain, inChainTruth, inGlob, output);
+}
+
+void SingleMerge(const char* inDirBase, const char* outDir, const char* tag, const char* treeName, const char* save_name, int first_run, int last_run){
+    
+    TString output=TString::Format("%s/merged_%s_%s_run%08d-%08d.root", outDir, tag, save_name, first_run, last_run);
+    TChain inChain(treeName);
+    TChain inChainTruth("Truth");
+    
+    int nFiles=0;
+    int nFilesTotal= 0;
+
+    int range = last_run - first_run;
+    for(int run = first_run; run < first_run + range; run++){
+        string runStr(TString::Format("%08d", run));
+        string runStrParts[4];
+        for(int i=0; i<4; ++i) runStrParts[i]=runStr.substr(i*2, 2);
+        
+        string subpath;
+        if(!m_fullpath) subpath = "grid/central_value/minerva/ana/";
+        else subpath = "";
+        
+        TString inGlob(TString::Format("%s/%s%s/%s/%s/%s/%s/%s_*%s_*_%s*.root",
+                                       inDirBase,
+                                       subpath.c_str(),
+                                       minerva_release.c_str(),
+                                       runStrParts[0].c_str(),
+                                       runStrParts[1].c_str(),
+                                       runStrParts[2].c_str(),
+                                       runStrParts[3].c_str(),
+                                       m_realdata ? "MV" : "SIM",
+                                       runStr.c_str(),
+                                       tag));
+        
+        glob_t g;
+        glob(inGlob.Data(), 0, 0, &g);
+        
+        nFilesTotal += g.gl_pathc;
+        cout << "Total files " << g.gl_pathc << ". Adding good files" << endl;
+
+        for(int i=0; i<(int)g.gl_pathc; ++i){
+            if(i%100==0) cout << i << " " << flush;
+            const char* filename=g.gl_pathv[i];
+            if(isGoodFile(filename) && GoodMetaData(filename)){
+                inChain.Add(filename);
+                if(!m_realdata) inChainTruth.Add(filename);
+                //else inChain
+                ++nFiles;
+            }
+            else{
+                cout << "Skipping " << filename << endl;
+            }
+        }
+        cout << endl;
+    }
+    
+    // For summing up the POT totals from the Meta tree
+    
+    //    double sumPOTUsed = 0.;=getTChainPOT(inChainTruth, "POT_Used");
+    //    double sumPOTTotal = 0.;
+    
+    //    if(!m_realdata){
+    double sumPOTUsed  = getTChainPOT(inChain, "POT_Used");
+    double sumPOTTotal = getTChainPOT(inChain, "POT_Total");
+    //    }
+    //else{
+    //    sumPOTUsed  = getTChainPOT(inChainTruth, "POT_Used");
+    //    sumPOTTotal = getTChainPOT(inChainTruth, "POT_Total");
+    //}
+    
+    cout << "Added " << nFiles << " files out of " << nFilesTotal << endl;
+    cout << "POT totals: Total = " << sumPOTTotal << " Used = " << sumPOTUsed << endl;
+    globfree(&g);
+    
+    if(nFiles==0){
+        cout << "No files added, nothing to do..." << endl;
+        return;
+    }
+    
+    TStopwatch ts;
+    TFile* fout=new TFile(output, "RECREATE");
+    cout << "Merging ana tree" << endl;
+    //setBranchStatuses(inChain);
+    fout->cd(); // Just in case the surrounding lines get separated
+    inChain.Merge(fout, 32000, "keep SortBasketsByBranch");
+    
+    if(!m_realdata){
+        cout << "Merging truth tree" << endl;
+        //setBranchStatuses(inChainTruth);
+        fout->cd();
+        TTree* outTreeTruth=inChainTruth.CopyTree("");
+        outTreeTruth->Write();
+    }
+    // inChainTruth.Merge(fout, 32000, "keep SortBasketsByBranch");
+    
+    fout->cd();
+    TTree* newMetaTree=new TTree("Meta", "");
+    newMetaTree->Branch("POT_Used", &sumPOTUsed);
+    newMetaTree->Branch("POT_Total", &sumPOTTotal);
+    //if(!mc) newMetaTree->Branch("POT_Unanalyzable", &sumPOTUnanalyzable);
+    newMetaTree->Fill();
+    newMetaTree->Write();
+    ts.Stop();
+    cout << "Merging time:" << endl;
+    ts.Print();
+    
+    fout->Close();
+    
+    
 }
 
 double MergeTool::getTChainPOT(TChain& ch, const char* branch)
@@ -240,7 +359,7 @@ int main(int argc, char *argv[])
     string anatree(anal_tree);// t -- set tree
     string analtool(anal_tool);
     
-    string ana_save_name = "SMILE";// s -- savename
+    string ana_save_name = "minerva";// s -- savename
     
     string infile;
     bool re_opt_i = false;
@@ -253,7 +372,7 @@ int main(int argc, char *argv[])
     
     bool is_per_dir = false;
     
-    bool merge = false;
+    int merge = -1;
     
     bool meta_data_check = true;
     
@@ -262,30 +381,49 @@ int main(int argc, char *argv[])
     bool full_path = false;
     
     char cc;
-    while ((cc = getopt(argc, argv, "i:o:t:s:n:h:p:a:m:c:r:f:")) != -1) {
+    while ((cc = getopt(argc, argv, "i:o:t:s:n:h:p:a:m:c:d:f:v:")) != -1) {
         switch (cc){
+            case 'v': minerva_release = optarg; break;
             case 'i': infile = optarg;  re_opt_i = true; break;
             case 'o': outfile = optarg; re_opt_o = true; break;
             case 't': anatree = optarg; break;
             case 'n': run_s = optarg; re_opt_n = true; break;
             case 's': ana_save_name = optarg; break;
-            case 'm': merge = true; break;
+            case 'm': merge = atoi(optarg); break;
             case 'p': is_per_dir = true; break;
             case 'a': analtool = optarg; break;
             case 'c': meta_data_check = false; break;
-            case 'r': real_data = true; break;
+            case 'd': real_data = true; break;
             case 'f': full_path = true; break;
             case 'h':
             //cout << argv[0] << endl
-                cout << "|*********************** Run Options ****************************|" << endl
+                cout << "|************************************************** Example *******************************************************|" << endl
+                << "| To merge from runs 13200 to 13260 of an analysis output into a single root file do:                              |" << endl
+                << "|                                                                                                                  |" << endl
+                << "| MergeTool.exe -i /pnfs/minerva/persistant/persistent/users/dcoplowe/CC1P1Pi_PL13C_111216 -n 13200-13260          |" << endl
+                << "|                                                                                                                  |" << endl
+                << "| This will save the output into the -i directory                                                                  |" << endl
+                << "|                                                                                                                  |" << endl
+                << "| To merge individual runs do:                                                                                     |" << endl
+                << "|                                                                                                                  |" << endl
+                << "| MergeTool.exe -i /pnfs/minerva/persistant/persistent/users/dcoplowe/CC1P1Pi_PL13C_111216 -n 13200-13260 -m=1     |" << endl
+                << "|                                                                                                                  |" << endl
+                << "| To combine the output of -m=1 do:                                                                                |" << endl
+                << "|                                                                                                                  |" << endl
+                << "| MergeTool.exe -i /pnfs/minerva/persistant/persistent/users/dcoplowe/CC1P1Pi_PL13C_111216 -n 13200-13260 -m=2     |" << endl
+                << "|                                                                                                                  |" << endl
+                << "|******************************************************************************************************************|" << endl
+                << " " << endl
+                << " " << endl
+                << "|*********************** Run Options ****************************|" << endl
                 << "| Default is to merge files in the root directory of your analy- |" << endl
                 << "| sis. The number of runs also needs to be defined and can be    |" << endl
                 << "| either a single run or run range (see below).                  |" << endl
                 << "|                                                                |" << endl
                 << "| Options:                                                       |" << endl
-                << "|   -i   :  Set input file dir if \"-per\" is defined only the     |" << endl
-                << "|        :  root directory of analysis in your persistent direc- |" << endl
-                << "|        :  tory is required.                                    |" << endl
+                << "|   -i   :  Set input file dir if \"-per\" is defined only the   |" << endl
+                << "|        :  root directory of your analysis in your persistent   |" << endl
+                << "|        :  directory is required.                               |" << endl
                 << "|        :                                                       |" << endl
                 << "|   -n   :  Run or run range: start-end e.g 13200-13250          |" << endl
                 << "|        :  will run over 50 runs from 13200 to 13250.           |" << endl
@@ -309,12 +447,19 @@ int main(int argc, char *argv[])
                 << "|        :                                                       |" << endl
                 << "|   -s   :  Set save name.                                       |" << endl
                 << "|        :                                                       |" << endl
-                << "| -merge :  Combine runs into a single root file.                |" << endl
+                << "|   -v   :  Set version of input anatuple files (vXrYpZ).        |" << endl
+                << "|        :  If not specified, use current release.               |" << endl
+                << "|        :                                                       |" << endl
+                << "| -m     :  Option 1 (-m=1): Combine each run into single root   |" << endl
+                << "|        :  file.                                                |" << endl
+                << "|        :  Option 2 (-m=2): Combine output of (-m-1) into a     |" << endl
+                << "|        :  single root file.                                    |" << endl
                 << "|        :                                                       |" << endl
                 << "| -check :  Merge without checking POT in Meta tree is good      |" << endl
                 << "|        :  (exists).                                            |" << endl
                 << "|        :                                                       |" << endl
-                << "| -real  :  Run on a real data file (merge without Truth tree).  |" << endl
+                << "| -data  :  Run on a data file (merge without Truth tree). Def-  |" << endl
+                << "|        :  ault is to assume you are running on MC.             |" << endl
                 << "|        :                                                       |" << endl
                 << "| -full  :  Add full directory path. This enables you to merge   |" << endl
                 << "|        :  special runs where the sub directories are not       |" << endl
@@ -388,16 +533,20 @@ int main(int argc, char *argv[])
     merger->IsRealData(real_data);
     merger->FullPath(full_path);
     
-    if(merge){
+    if(merge = 2){
             cout<< "Only merging merged runs" << endl;
             merger->AllRuns(infile.c_str(), analtool.c_str(), anatree.c_str(), ana_save_name.c_str());
     }
-    else{
-        cout << "Merging sub-runs for each run and then merging runs" << endl;
+    else if(merge = 1){
+        cout << "Merging sub-runs for each run" << endl;
         for(int i=first_run; i < last_run + 1; i++){
             cout << "Merging Run " << i << endl;
             merger->EachRun(infile.c_str(), outfile.c_str(), i, analtool.c_str(), anatree.c_str(), ana_save_name.c_str());
         }
+    }
+    else{
+        cout << "Merging sub-runs for each run into a single root file" << endl;
+        merger->SingleMerge(infile.c_str(), outfile.c_str(), analtool.c_str(), anatree.c_str(), ana_save_name.c_str(), first_run, last_run);
     }
     
     delete merger;
