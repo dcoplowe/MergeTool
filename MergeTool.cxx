@@ -26,9 +26,9 @@ public:
     MergeTool() : m_realdata(false), m_fullpath(false), m_checkmeta(true) {};
     ~MergeTool(){};
     
-    void EachRun(const char* inDirBase, const char* outDir, int run, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
-    void SingleMerge(const char* inDirBase, const char* outDir, int first_run, int last_run, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
-    void AllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* treeName="CC1P1Pi", const char* save_name = "");
+    void EachRun(const char* inDirBase, const char* outDir, int run, const char* tag="CC1P1Pi", const char* treeName="sel", const char* save_name = "");
+    void SingleMerge(const char* inDirBase, const char* outDir, int first_run, int last_run, const char* tag="CC1P1Pi", const char* treeName="sel", const char* save_name = "");
+    void AllRuns(const char* outDir, const char* tag="CC1P1Pi", const char* treeName="sel", const char* save_name = "");
 
     void SetMinervaRelease(char const * var){ minerva_release = string(var); }
     void CheckMetaData(bool var){ m_checkmeta = var; }
@@ -37,6 +37,8 @@ public:
     
 private:
     void Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TString output);
+    void Merge(const char* treeName, const char* truthname, TString inGlob, TString output);
+    
     double getTChainPOT(TChain& ch, const char* branch = "POT_Used");
     bool isGoodFile(const char* filename);
     bool GoodMetaData(const char* filename);
@@ -58,6 +60,14 @@ void MergeTool::Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TSt
     glob(inGlob.Data(), 0, 0, &g);
     
     cout << "Total files " << g.gl_pathc << ". Adding good files" << endl;
+    
+    //Mode this up from below:
+    TStopwatch ts;
+    TFile* fout=new TFile(output, "RECREATE");
+    cout << "Merging ana tree" << endl;
+    //setBranchStatuses(inChain);
+    fout->cd(); // Just in case the surrounding lines get separated
+    //End
     
     int nFiles=0;
     for(int i=0; i<(int)g.gl_pathc; ++i){
@@ -99,11 +109,11 @@ void MergeTool::Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TSt
         return;
     }
     
-    TStopwatch ts;
-    TFile* fout=new TFile(output, "RECREATE");
-    cout << "Merging ana tree" << endl;
-    //setBranchStatuses(inChain);
-    fout->cd(); // Just in case the surrounding lines get separated
+//    TStopwatch ts;
+//    TFile* fout=new TFile(output, "RECREATE");
+//    cout << "Merging ana tree" << endl;
+//    //setBranchStatuses(inChain);
+//    fout->cd(); // Just in case the surrounding lines get separated
     inChain.Merge(fout, 32000, "keep SortBasketsByBranch");
     
     if(!m_realdata){
@@ -129,12 +139,107 @@ void MergeTool::Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TSt
     fout->Close();
 }
 
+void MergeTool::Merge(const char* treeName, const char* truthname, TString inGlob, TString output){
+    
+    cout << "Filename glob is " << inGlob << endl;
+    cout << "Output filename is " << output << endl;
+    
+    //Set boolians in initialisation:
+    
+    glob_t g;
+    glob(inGlob.Data(), 0, 0, &g);
+    
+    cout << "Total files " << g.gl_pathc << ". Adding good files" << endl;
+    
+    //Mode this up from below:
+    TStopwatch ts;
+    TFile* fout=new TFile(output, "RECREATE");
+    cout << "Merging ana tree" << endl;
+    //setBranchStatuses(inChain);
+    fout->cd(); // Just in case the surrounding lines get separated
+    //End
+    
+    TChain inChain(treeName);
+    TChain inChainTruth(truthname);
+    
+    int nFiles=0;
+    for(int i=0; i<(int)g.gl_pathc; ++i){
+        if(i%100==0) cout << i << " " << flush;
+        const char* filename=g.gl_pathv[i];
+        if(isGoodFile(filename) && GoodMetaData(filename)){
+            inChain.Add(filename);
+            if(!m_realdata) inChainTruth.Add(filename);
+            //else inChain
+            ++nFiles;
+        }
+        else{
+            cout << "Skipping " << filename << endl;
+        }
+    }
+    cout << endl;
+    
+    // For summing up the POT totals from the Meta tree
+    
+    //    double sumPOTUsed = 0.;=getTChainPOT(inChainTruth, "POT_Used");
+    //    double sumPOTTotal = 0.;
+    
+    //    if(!m_realdata){
+    double sumPOTUsed  = getTChainPOT(inChain, "POT_Used");
+    double sumPOTTotal = getTChainPOT(inChain, "POT_Total");
+    //    }
+    //else{
+    //    sumPOTUsed  = getTChainPOT(inChainTruth, "POT_Used");
+    //    sumPOTTotal = getTChainPOT(inChainTruth, "POT_Total");
+    //}
+    
+    int nFilesTotal=g.gl_pathc;
+    cout << "Added " << nFiles << " files out of " << nFilesTotal << endl;
+    cout << "POT totals: Total = " << sumPOTTotal << " Used = " << sumPOTUsed << endl;
+    globfree(&g);
+    
+    if(nFiles==0){
+        cout << "No files added, nothing to do..." << endl;
+        return;
+    }
+    
+    //    TStopwatch ts;
+    //    TFile* fout=new TFile(output, "RECREATE");
+    //    cout << "Merging ana tree" << endl;
+    //    //setBranchStatuses(inChain);
+    //    fout->cd(); // Just in case the surrounding lines get separated
+    inChain.Merge(fout, 32000, "keep SortBasketsByBranch");
+    
+    if(!m_realdata){
+        cout << "Merging truth tree" << endl;
+        //setBranchStatuses(inChainTruth);
+        fout->cd();
+        TTree* outTreeTruth=inChainTruth.CopyTree("");
+        outTreeTruth->Write();
+    }
+    // inChainTruth.Merge(fout, 32000, "keep SortBasketsByBranch");
+    
+    fout->cd();
+    TTree* newMetaTree=new TTree("Meta", "");
+    newMetaTree->Branch("POT_Used", &sumPOTUsed);
+    newMetaTree->Branch("POT_Total", &sumPOTTotal);
+    //if(!mc) newMetaTree->Branch("POT_Unanalyzable", &sumPOTUnanalyzable);
+    newMetaTree->Fill();
+    newMetaTree->Write();
+    ts.Stop();
+    cout << "Merging time:" << endl;
+    ts.Print();
+    
+    fout->Close();
+    
+    
+}
+
 
 void MergeTool::EachRun(const char* inDirBase, const char* outDir, int run, const char* tag, const char* treeName, const char* save_name){
     
     TString output=TString::Format("%s/merged_%s_%s_run%08d.root", outDir, tag, save_name, run);
-    TChain inChain(treeName);
-    TChain inChainTruth("Truth");
+//    TChain inChain(treeName);
+//    TChain inChainTruth("Truth");
     
     string runStr(TString::Format("%08d", run));
     string runStrParts[4];
@@ -156,7 +261,10 @@ void MergeTool::EachRun(const char* inDirBase, const char* outDir, int run, cons
                                    runStr.c_str(),
                                    tag));
 
-    Merge(inChain, inChainTruth, inGlob, output);
+    Merge(treeName, truthname, inGlob, output);
+
+//    Merge(inChain, inChainTruth, inGlob, output);
+
 }
 
 void MergeTool::AllRuns(const char* outDir, const char* tag, const char* treeName, const char* save_name){
@@ -166,23 +274,37 @@ void MergeTool::AllRuns(const char* outDir, const char* tag, const char* treeNam
     //******************************************************************
     //* Load Input Ntuples
     //******************************************************************
-    TChain inChain(treeName);
-    TChain inChainTruth("Truth");
+//    TChain inChain(treeName);
+//    TChain inChainTruth("Truth");
     
     TString inGlob(TString::Format("%s/merged_%s_%s_run*.root",outDir, tag, save_name));
     
-    Merge(inChain, inChainTruth, inGlob, output);
+    Merge(treeName, truthname, inGlob, output);
+    
+//    Merge(inChain, inChainTruth, inGlob, output);
+//    Merge(inChain, inChainTruth, inGlob, output);
+
+
 }
 
 void MergeTool::SingleMerge(const char* inDirBase, const char* outDir, int first_run, int last_run, const char* tag, const char* treeName, const char* save_name){
     
     TString output=TString::Format("%s/merged_%s_%s_run%08d-%08d.root", outDir, tag, save_name, first_run, last_run);
-    TChain inChain(treeName);
-    TChain inChainTruth("Truth");
     
     int nFiles=0;
     int nFilesTotal= 0;
 
+    //Moved this up from below:
+    TStopwatch ts;
+    TFile* fout=new TFile(output, "RECREATE");
+    cout << "Merging ana tree" << endl;
+    //setBranchStatuses(inChain);
+    fout->cd(); // Just in case the surrounding lines get separated
+    //END
+    
+    TChain inChain(treeName);
+    TChain inChainTruth("Truth");
+    
     int range = last_run - first_run;
     for(int run = first_run; run < first_run + range; run++){
         string runStr(TString::Format("%08d", run));
@@ -251,11 +373,11 @@ void MergeTool::SingleMerge(const char* inDirBase, const char* outDir, int first
         return;
     }
     
-    TStopwatch ts;
-    TFile* fout=new TFile(output, "RECREATE");
-    cout << "Merging ana tree" << endl;
-    //setBranchStatuses(inChain);
-    fout->cd(); // Just in case the surrounding lines get separated
+//    TStopwatch ts;
+//    TFile* fout=new TFile(output, "RECREATE");
+//    cout << "Merging ana tree" << endl;
+//    //setBranchStatuses(inChain);
+//    fout->cd(); // Just in case the surrounding lines get separated
     inChain.Merge(fout, 32000, "keep SortBasketsByBranch");
     
     if(!m_realdata){
