@@ -261,7 +261,7 @@ void MergeTool::EachRun(const char* inDirBase, const char* outDir, int run, cons
                                    runStr.c_str(),
                                    tag));
 
-    Merge(treeName, truthname, inGlob, output);
+    Merge(treeName, "Truth", inGlob, output);
 
 //    Merge(inChain, inChainTruth, inGlob, output);
 
@@ -279,7 +279,7 @@ void MergeTool::AllRuns(const char* outDir, const char* tag, const char* treeNam
     
     TString inGlob(TString::Format("%s/merged_%s_%s_run*.root",outDir, tag, save_name));
     
-    Merge(treeName, truthname, inGlob, output);
+    Merge(treeName, "Truth", inGlob, output);
     
 //    Merge(inChain, inChainTruth, inGlob, output);
 //    Merge(inChain, inChainTruth, inGlob, output);
