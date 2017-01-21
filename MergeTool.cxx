@@ -39,6 +39,7 @@ private:
     void Merge(TChain &inChain, TChain &inChainTruth, TString inGlob, TString output);
     void Merge(const char* treeName, const char* truthname, TString inGlob, TString output);
     
+    double getTChainPOT(TChain * ch, const char* branch = "POT_Used");
     double getTChainPOT(TChain& ch, const char* branch = "POT_Used");
     bool isGoodFile(const char* filename);
     bool GoodMetaData(const char* filename);
@@ -296,14 +297,14 @@ void MergeTool::SingleMerge(const char* inDirBase, const char* outDir, int first
 
     //Moved this up from below:
     TStopwatch ts;
-    TFile* fout=new TFile(output, "RECREATE");
+    TFile * fout = new TFile(output, "RECREATE");
     cout << "Merging ana tree" << endl;
     //setBranchStatuses(inChain);
     fout->cd(); // Just in case the surrounding lines get separated
     //END
     
-    TChain inChain(treeName);
-    TChain inChainTruth("Truth");
+    TChain * inChain = new TChain(treeName);
+    TChain * inChainTruth = new TChain("Truth");
     
     int range = last_run - first_run;
     for(int run = first_run; run < first_run + range; run++){
@@ -337,8 +338,8 @@ void MergeTool::SingleMerge(const char* inDirBase, const char* outDir, int first
             if(i%100==0) cout << i << " " << flush;
             const char* filename=g.gl_pathv[i];
             if(isGoodFile(filename) && GoodMetaData(filename)){
-                inChain.Add(filename);
-                if(!m_realdata) inChainTruth.Add(filename);
+                inChain->Add(filename);
+                if(!m_realdata) inChainTruth->Add(filename);
                 //else inChain
                 ++nFiles;
             }
@@ -357,8 +358,10 @@ void MergeTool::SingleMerge(const char* inDirBase, const char* outDir, int first
     //    double sumPOTTotal = 0.;
     
     //    if(!m_realdata){
+    cout << "Getting POT and summing." << endl;
     double sumPOTUsed  = getTChainPOT(inChain, "POT_Used");
     double sumPOTTotal = getTChainPOT(inChain, "POT_Total");
+    cout << "Finished counting POT." << endl;
     //    }
     //else{
     //    sumPOTUsed  = getTChainPOT(inChainTruth, "POT_Used");
@@ -378,7 +381,7 @@ void MergeTool::SingleMerge(const char* inDirBase, const char* outDir, int first
 //    cout << "Merging ana tree" << endl;
 //    //setBranchStatuses(inChain);
 //    fout->cd(); // Just in case the surrounding lines get separated
-    inChain.Merge(fout, 32000, "keep SortBasketsByBranch");
+    inChain->Merge(fout, 32000, "keep SortBasketsByBranch");
     
     if(!m_realdata){
         cout << "Merging truth tree" << endl;
@@ -402,6 +405,7 @@ void MergeTool::SingleMerge(const char* inDirBase, const char* outDir, int first
     
     fout->Close();
     
+    delete fout;//Added 210117
     
 }
 
@@ -409,7 +413,7 @@ double MergeTool::getTChainPOT(TChain& ch, const char* branch)
 {
     double sumPOTUsed=0;
     
-    TObjArray *fileElements=ch.GetListOfFiles();
+    TObjArray * fileElements = ch.GetListOfFiles();
     TIter next(fileElements);
     TChainElement *chEl=0;
     while (( chEl=(TChainElement*)next() )) {
@@ -423,7 +427,40 @@ double MergeTool::getTChainPOT(TChain& ch, const char* branch)
         t->GetEntry(0);
         TLeaf* lUsed=t->GetLeaf(branch);
         if(lUsed)         sumPOTUsed+=lUsed->GetValue();
+        
+        if(lUsed) delete lUsed;//Added 210117
+        delete t;//Added 210117
     }
+    
+    delete fileElements;//Added 210117
+    
+    return sumPOTUsed;
+}
+
+double MergeTool::getTChainPOT(TChain * ch, const char* branch)
+{
+    double sumPOTUsed=0;
+    
+    TObjArray * fileElements = ch->GetListOfFiles();
+    TIter next(fileElements);
+    TChainElement *chEl=0;
+    while (( chEl=(TChainElement*)next() )) {
+        TFile f = new TFile(chEl->GetTitle(), "READ");
+        TTree * t = (TTree*)f->Get("Meta");
+        if(!t){
+            cout << "No Meta tree in file " << chEl->GetTitle() << endl;
+            continue;
+        }
+        assert(t->GetEntries()==1);
+        t->GetEntry(0);
+        TLeaf* lUsed=t->GetLeaf(branch);
+        if(lUsed)         sumPOTUsed+=lUsed->GetValue();
+        
+        if(lUsed) delete lUsed;//Added 210117
+        delete t;//Added 210117
+    }
+    
+    delete fileElements;//Added 210117
     
     return sumPOTUsed;
 }
@@ -437,6 +474,7 @@ bool MergeTool::isGoodFile(const char* filename)
     if(!meta->GetBranch("POT_Total")) return false;
     if(!meta->GetBranch("POT_Used")) return false;
     if(!m_realdata && !f.Get("Truth")) return false;//Check this.
+    delete meta;//Added 210117
     return true;
 }
 
@@ -450,6 +488,7 @@ bool MergeTool::GoodMetaData(const char* filename){
     if(!meta) return false;
     if(meta->GetEntriesFast() == 0) return false;
     if(!meta->GetBranch("POT_Used")) return false;
+    delete meta;//Added 210117
     return true;
 }
 
@@ -637,9 +676,9 @@ int main(int argc, char *argv[])
     
     cout << "|---------------------------------- Inputs ----------------------------------" << endl;
     if(meta_data_check) cout << "|                   Checking POT info is good. (Switch off using -check)" << endl;
-    if(merge || is_per_dir || full_path || real_data) cout << "| Option(s) called: " << endl;
+    if(is_per_dir || full_path || real_data) cout << "| Option(s) called: " << endl;
     if(is_per_dir) cout << "|                   (-per)   In/out files are in persistent." << endl;
-    if(merge) cout << "|                   (-merge) Merge the merged run files." << endl;
+//    if(merge) cout << "|                   (-merge) Merge the merged run files." << endl;
     if(real_data) cout << "|                   (-real) Merging real data files." << endl;
     if(full_path) cout << "|                   (-full) User defining full path." << endl;
     cout << "| Input  (-i): " << infile << endl;
