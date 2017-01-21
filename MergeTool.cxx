@@ -458,8 +458,8 @@ double MergeTool::getTChainPOT(TChain * ch, const char* branch)
         
         if(lUsed) delete lUsed;//Added 210117
         
-        delete t;//Added 210117
         f->Close();
+        delete t;//Added 210117
         delete f;
     }
     
