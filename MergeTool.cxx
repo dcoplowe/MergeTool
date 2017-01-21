@@ -387,7 +387,7 @@ void MergeTool::SingleMerge(const char* inDirBase, const char* outDir, int first
         cout << "Merging truth tree" << endl;
         //setBranchStatuses(inChainTruth);
         fout->cd();
-        TTree* outTreeTruth=inChainTruth.CopyTree("");
+        TTree* outTreeTruth=inChainTruth->CopyTree("");
         outTreeTruth->Write();
     }
     // inChainTruth.Merge(fout, 32000, "keep SortBasketsByBranch");
@@ -445,7 +445,7 @@ double MergeTool::getTChainPOT(TChain * ch, const char* branch)
     TIter next(fileElements);
     TChainElement *chEl=0;
     while (( chEl=(TChainElement*)next() )) {
-        TFile f = new TFile(chEl->GetTitle(), "READ");
+        TFile * f = new TFile(chEl->GetTitle(), "READ");
         TTree * t = (TTree*)f->Get("Meta");
         if(!t){
             cout << "No Meta tree in file " << chEl->GetTitle() << endl;
