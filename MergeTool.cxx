@@ -457,7 +457,10 @@ double MergeTool::getTChainPOT(TChain * ch, const char* branch)
         if(lUsed)         sumPOTUsed+=lUsed->GetValue();
         
         if(lUsed) delete lUsed;//Added 210117
+        
         delete t;//Added 210117
+        f->Close();
+        delete f;
     }
     
     delete fileElements;//Added 210117
