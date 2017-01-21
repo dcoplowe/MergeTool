@@ -445,8 +445,8 @@ double MergeTool::getTChainPOT(TChain * ch, const char* branch)
     TIter next(fileElements);
     TChainElement *chEl=0;
     while (( chEl=(TChainElement*)next() )) {
-        TFile * f = new TFile(chEl->GetTitle(), "READ");
-        TTree * t = (TTree*)f->Get("Meta");
+        TFile f(chEl->GetTitle());
+        TTree * t = (TTree*)f.Get("Meta");
         if(!t){
             cout << "No Meta tree in file " << chEl->GetTitle() << endl;
             continue;
@@ -458,9 +458,8 @@ double MergeTool::getTChainPOT(TChain * ch, const char* branch)
         
         if(lUsed) delete lUsed;//Added 210117
         
-        f->Close();
         delete t;//Added 210117
-        delete f;
+        f.Close();
     }
     
     delete fileElements;//Added 210117
