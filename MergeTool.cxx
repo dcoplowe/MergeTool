@@ -462,7 +462,7 @@ double MergeTool::getTChainPOT(TChain * ch, const char* branch)
 //        delete t;//Added 210117
     }
     
-    delete fileElements;//Added 210117
+//    delete fileElements;//Added 210117
     
     cout << "MergeTool::getTChainPOT(TChain * ch, const char* branch) :: delete fileElements. " << endl;
 
