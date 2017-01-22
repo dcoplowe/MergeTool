@@ -207,7 +207,7 @@ void MergeTool::Merge(const char* treeName, const char* truthname, TString inGlo
     //    TFile* fout=new TFile(output, "RECREATE");
     //    cout << "Merging ana tree" << endl;
     //    //setBranchStatuses(inChain);
-    //    fout->cd(); // Just in case the surrounding lines get separated
+    fout->cd(); // Just in case the surrounding lines get separated
     inChain.Merge(fout, 32000, "keep SortBasketsByBranch");
     
     if(!m_realdata){
@@ -616,9 +616,9 @@ int main(int argc, char *argv[])
                 << "|   -v   :  Set version of input anatuple files (vXrYpZ).        |" << endl
                 << "|        :  If not specified, use current release.               |" << endl
                 << "|        :                                                       |" << endl
-                << "| -m     :  Option 1 (-m=1): Combine each run into single root   |" << endl
+                << "| -m     :  Option 1 (-m 1): Combine each run into single root   |" << endl
                 << "|        :  file.                                                |" << endl
-                << "|        :  Option 2 (-m=2): Combine output of (-m-1) into a     |" << endl
+                << "|        :  Option 2 (-m 2): Combine output of (-m 1) into a     |" << endl
                 << "|        :  single root file.                                    |" << endl
                 << "|        :                                                       |" << endl
                 << "| -check :  Merge without checking POT in Meta tree is good      |" << endl
@@ -677,6 +677,8 @@ int main(int argc, char *argv[])
     }
     
     if(!re_opt_o) outfile = infile;
+    
+    cout << "Merge = " << merge << endl;
     
     cout << "|---------------------------------- Inputs ----------------------------------" << endl;
     if(meta_data_check) cout << "|                   Checking POT info is good. (Switch off using -check)" << endl;
