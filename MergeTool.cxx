@@ -457,9 +457,9 @@ double MergeTool::getTChainPOT(TChain * ch, const char* branch)
         if(lUsed)         sumPOTUsed+=lUsed->GetValue();
         cout << "MergeTool::getTChainPOT(TChain * ch, const char* branch) :: Looping. " << endl;
 
-        if(lUsed) delete lUsed;//Added 210117
-        f.Close();
-        delete t;//Added 210117
+//        if(lUsed) delete lUsed;//Added 210117
+//        f.Close();
+//        delete t;//Added 210117
     }
     
     delete fileElements;//Added 210117
