@@ -380,7 +380,7 @@ void MergeTool::SingleMerge(const char* inDirBase, const char* outDir, int first
 //    TFile* fout=new TFile(output, "RECREATE");
 //    cout << "Merging ana tree" << endl;
 //    //setBranchStatuses(inChain);
-//    fout->cd(); // Just in case the surrounding lines get separated
+    fout->cd(); // Just in case the surrounding lines get separated
     inChain->Merge(fout, 32000, "keep SortBasketsByBranch");
     
     if(!m_realdata){
