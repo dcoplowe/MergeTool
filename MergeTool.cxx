@@ -455,7 +455,7 @@ double MergeTool::getTChainPOT(TChain * ch, const char* branch)
         t->GetEntry(0);
         TLeaf* lUsed=t->GetLeaf(branch);
         if(lUsed)         sumPOTUsed+=lUsed->GetValue();
-        cout << "MergeTool::getTChainPOT(TChain * ch, const char* branch) :: Looping. " << endl;
+//        cout << "MergeTool::getTChainPOT(TChain * ch, const char* branch) :: Looping. " << endl;
 
 //        if(lUsed) delete lUsed;//Added 210117
 //        f.Close();
@@ -464,7 +464,7 @@ double MergeTool::getTChainPOT(TChain * ch, const char* branch)
     
 //    delete fileElements;//Added 210117
     
-    cout << "MergeTool::getTChainPOT(TChain * ch, const char* branch) :: delete fileElements. " << endl;
+//    cout << "MergeTool::getTChainPOT(TChain * ch, const char* branch) :: delete fileElements. " << endl;
 
     return sumPOTUsed;
 }
