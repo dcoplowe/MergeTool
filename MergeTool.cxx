@@ -457,7 +457,7 @@ double MergeTool::getTChainPOT(TChain * ch, const char* branch)
         if(lUsed)         sumPOTUsed+=lUsed->GetValue();
         
         if(lUsed) delete lUsed;//Added 210117
-        f.Close();
+//        f.Close();
         //delete t;//Added 210117
     }
     
