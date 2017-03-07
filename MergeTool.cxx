@@ -263,7 +263,7 @@ void MergeTool::Run(){
             cout << "g.gl_pathc = " << g.gl_pathc << endl;
             
             if(npaths == 1){
-                a *= 1e2;
+//                a *= 1e2;
                 end_base += a;
                 end_base_s += sub1;
                 end_base_s += "/";
