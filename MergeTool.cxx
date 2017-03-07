@@ -142,7 +142,7 @@ void MergeTool::InspectDir(){
         }
     }
     
-    int start_base;
+    int start_base = -999;
     std::string start_base_s;
     
     for(int a = 0; a < 100; a++){
@@ -227,7 +227,7 @@ void MergeTool::InspectDir(){
     //        cout << "start_base   = " << start_base << endl;
     //        cout << "start_base_s = " << start_base_s << endl;
     
-    int end_base;
+    int end_base = -999;
     std::string end_base_s;
     
     for(int a = 99; a > -1; a--){
@@ -315,6 +315,9 @@ void MergeTool::InspectDir(){
     
     if(m_start == -999)  m_start = start_base;
     if(m_finish == -999) m_finish = end_base;
+    
+    cout << "m_start   = " << m_start << endl;
+    cout << "m_finish = " << m_finish << endl;
     
 }
 
