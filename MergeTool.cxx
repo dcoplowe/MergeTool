@@ -117,8 +117,8 @@ void MergeTool::Run(){
         for (int i = 0; i < (int)g.gl_pathc; i++){
             const char* filename=g.gl_pathv[i];
     
-//            if(GoodFile(filename) && GoodMeta(filename)){
-//                outfile->cd();
+            if(GoodFile(filename) && GoodMeta(filename)){
+                outfile->cd();
                 recon->Add(filename);
                 if(m_is_mc) truth->Add(filename);
                 n_mergedfiles++;
