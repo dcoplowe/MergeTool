@@ -101,6 +101,7 @@ void MergeTool::Run(){
             }
         }
         
+        
         for(int a = 0; a < 100; a++){
          
             std::string sub1 = Form("%.2d",a);
@@ -142,7 +143,7 @@ void MergeTool::Run(){
 //
 //    if(m_outfilename.empty()){
 //        m_outfilename = "merged_" + %s + "_" + "runs" %08d+ "-" + %08d + ".root";
-    }
+//    }
 //
 //    
 //    TFile * outfile = new TFile( (m_root_indir + "/"  + m_outfilename).c_str(), "RECREATE");
