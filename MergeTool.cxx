@@ -162,7 +162,7 @@ bool MergeTool::GoodFile(const char* filename){
     if(!meta) return false;
     if(!meta->GetBranch("POT_Total")) return false;
     if(!meta->GetBranch("POT_Used")) return false;
-    if(!m_realdata && !f.Get("Truth")) return false;//Check this.
+    if(m_is_mc && !f.Get("Truth")) return false;//Check this.
     delete meta;//Added 210117
     return true;
 }
