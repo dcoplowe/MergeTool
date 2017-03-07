@@ -70,6 +70,8 @@ void MergeTool::Run(){
     
     cout << "basedir = " << basedir << endl;
     
+    cout << "m_start == " << m_start << "  ||  m_finish == " << m_finish << endl;
+    
     if(m_start == -999 || m_finish == -999){
         
         //find start directory:
