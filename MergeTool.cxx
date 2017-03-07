@@ -128,7 +128,7 @@ void MergeTool::Run(){
         globfree(&g);
     }
     
-    cout << "Merging " << n_mergedfiles << "/" << n_files << " (" << 100*n_mergedfiles/n_files << "%) files." << endl;
+    cout << "Merging " << n_mergedfiles << "/" << n_files << " (" << (double)(100*n_mergedfiles/n_files) << "%) files." << endl;
     cout << "Producing recon tree: " << m_analysis_tree << "." << endl;
     outfile->cd(); // Just in case the surrounding lines get separated
     recon->Merge(outfile, 32000, "keep SortBasketsByBranch");
