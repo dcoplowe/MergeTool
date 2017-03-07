@@ -128,17 +128,18 @@ void MergeTool::Run(){
         globfree(&g);
     }
     
-    if(m_is_mc){
-        cout << "Producing truth tree: Truth." << endl;
-        outfile->cd();
-        TTree * truth_copy = truth->CopyTree("");
-        truth_copy->Write();
-    }
-    
     cout << "Merging " << n_mergedfiles << "/" << n_files << " (" << 100*n_mergedfiles/n_files << ") files." << endl;
     cout << "Producing recon tree: " << m_analysis_tree << "." << endl;
     outfile->cd(); // Just in case the surrounding lines get separated
     recon->Merge(outfile, 32000, "keep SortBasketsByBranch");
+    
+    if(m_is_mc){
+        cout << "Producing truth tree: Truth." << endl;
+        outfile->cd();
+        truth->Merge(outfile, 32000, "keep SortBasketsByBranch");
+//        TTree * truth_copy = truth->CopyTree("");
+//        truth_copy->Write();
+    }
     
     cout << "Producing truth tree: Meta." << endl;
     double sumPOTUsed  = getTChainPOT(recon, "POT_Used");
