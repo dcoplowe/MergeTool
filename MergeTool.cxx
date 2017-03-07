@@ -74,6 +74,8 @@ void MergeTool::Run(){
         
         //find start directory:
         
+        cout << "Finding run range" << endl;
+        
 //        std::string sub1;
         std::string sub2;
         std::string sub3;
@@ -85,10 +87,15 @@ void MergeTool::Run(){
             
             std::string tmp = basedir + sub1;
             
+            cout << "Checking if " << tmp << " exists" << endl;
+            
             glob_t g;
             glob(tmp.c_str(), 0, 0, &g);
             
             int npaths = g.gl_pathc;
+            
+            cout << "g.gl_pathc = " << g.gl_pathc << endl;
+            
             if(npaths == 1){
                 basedir += sub1;
                 basedir += "/";
