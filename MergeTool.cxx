@@ -268,17 +268,20 @@ int main(int argc, char *argv[])
     
     int first_run = -999;
     int last_run =  -999;
-    TString run_ts = run_s;
-    if(run_ts.Contains("-",TString::kExact)){
-        TString tmp_first( run_ts(0,run_ts.First("-")) );
-        first_run = tmp_first.Atoi();
-        
-        TString tmp_last( run_ts(run_ts.First("-") + 1, run_ts.Length()) );
-        last_run = tmp_last.Atoi();
-    }
-    else{
-        first_run = run_ts.Atoi();
-        last_run = first_run + 1;//Do we want the plus one?
+    
+    if(!run_s.empty()){
+        TString run_ts = run_s;
+        if(run_ts.Contains("-",TString::kExact)){
+            TString tmp_first( run_ts(0,run_ts.First("-")) );
+            first_run = tmp_first.Atoi();
+            
+            TString tmp_last( run_ts(run_ts.First("-") + 1, run_ts.Length()) );
+            last_run = tmp_last.Atoi();
+        }
+        else{
+            first_run = run_ts.Atoi();
+            last_run = first_run + 1;//Do we want the plus one?
+        }
     }
     
     cout << "|---------------------------------- Inputs ----------------------------------" << endl;
