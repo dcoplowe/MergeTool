@@ -77,29 +77,27 @@ MergeTool::MergeTool(std::string root_indir, std::string minerva_release, std::s
 void MergeTool::Run(){
     
     InspectDir();
-//        
-//        std::string ;
-//        std::string sub4;
-//
-//        
-//        for(int a = 0; a < 100; a++){
-//            
-//        }
-//        
-//        for(int a = 0; a < 100; a++){
-//            
-//        }
-//        
-//        if(m_start == -999) m_start = begin;
-//        if(m_finish == -999) m_finish = end;
 
-//
-//    if(m_outfilename.empty()){
-//        m_outfilename = "merged_" + %s + "_" + "runs" %08d+ "-" + %08d + ".root";
-//    }
-//
-//    
-//    TFile * outfile = new TFile( (m_root_indir + "/"  + m_outfilename).c_str(), "RECREATE");
+    if(m_outfilename.empty()){
+        m_outfilename = Form("merged_runs%08d-%08d.root", m_start, m_finish);
+    }
+
+    TFile * outfile = new TFile( (m_root_indir + "/"  + m_outfilename).c_str(), "RECREATE");
+    outfile->cd();
+    
+    TChain * recon = new TChain(m_analysis_tree.c_str());
+    TChain * truth = new TChain("Truth");
+    
+    for(int run = m_start; run < m_finish + 1; run++){
+        
+        string run_s = Form("%.8d", run);//This was .8d but we have already found this bit.
+        string run_spars[3];
+        for (int i = 0; i < 3; i++) run_spars[i] = run_s.substr( 2*(i + 1), 2);
+        
+        string flist = Form("%s/%s/%s/%s/%s_*%s_*_%s*.root", m_basedir.c_str(), run_spars[0].c_str(), run_spars[1].c_str(), run_spars[2].c_str(),
+                            m_is_mc ? "SIM" : "MV", run_s.c_str(), m_analysis_name.c_str());
+        cout << "flist = " << flist << endl;
+    }
     
 }
 
@@ -110,13 +108,13 @@ void MergeTool::InspectDir(){
 //    
 //    cout << "basedir = " << basedir << endl;
     
-    cout << "m_start == " << m_start << "  ||  m_finish == " << m_finish << endl;
+//    cout << "m_start == " << m_start << "  ||  m_finish == " << m_finish << endl;
     
     //    if(m_start == -999 || m_finish == -999){
     
     //find start directory:
     
-    cout << "Finding run range" << endl;
+    cout << "Inspecting direcrtory structure..." << endl;
     
     for(int a = 0; a < 100; a++){
         
@@ -308,17 +306,19 @@ void MergeTool::InspectDir(){
         }
     }
     //
-    cout << "start_base   = " << start_base << endl;
-    cout << "start_base_s = " << start_base_s << endl;
-    cout << "end_base   = " << end_base << endl;
-    cout << "end_base_s = " << end_base_s << endl;
-    
+//    cout << "start_base   = " << start_base << endl;
+//    cout << "start_base_s = " << start_base_s << endl;
+//    cout << "end_base   = " << end_base << endl;
+//    cout << "end_base_s = " << end_base_s << endl;
     if(m_start == -999)  m_start = start_base;
     if(m_finish == -999) m_finish = end_base;
+//    cout << "m_start   = " << m_start << endl;
+//    cout << "m_finish = " << m_finish << endl;
     
-    cout << "m_start   = " << m_start << endl;
-    cout << "m_finish = " << m_finish << endl;
-    
+    if(m_start == -999 || m_finish == -999){
+        cout << "Error could not determine range... Input manually (-n Start-Finish)" << endl;
+        exit(0);
+    }
 }
 
 int main(int argc, char *argv[])
@@ -469,7 +469,7 @@ int main(int argc, char *argv[])
         }
         else{
             first_run = run_ts.Atoi();
-            last_run = first_run + 1;//Do we want the plus one?
+            last_run = first_run;
         }
     }
     
