@@ -283,9 +283,9 @@ void MergeTool::InspectDir(){
             }
         }
         
-        cout << "end_base   = " << end_base << endl;
-        cout << "end_base_s = " << end_base_s << endl;
-        
+//        cout << "end_base   = " << end_base << endl;
+//        cout << "end_base_s = " << end_base_s << endl;
+    
         for(int a = 99; a > -1; a--){
             
             std::string sub1 = Form("%.2d",a);
@@ -311,11 +311,11 @@ void MergeTool::InspectDir(){
             }
         }
         //        
-        //        cout << "start_base   = " << start_base << endl;
-        //        cout << "start_base_s = " << start_base_s << endl;
-        //        cout << "end_base   = " << end_base << endl;
-        //        cout << "end_base_s = " << end_base_s << endl;
-        
+                cout << "start_base   = " << start_base << endl;
+                cout << "start_base_s = " << start_base_s << endl;
+                cout << "end_base   = " << end_base << endl;
+                cout << "end_base_s = " << end_base_s << endl;
+    
         if(m_start == -999)  m_start = start_base;
         if(m_finish == -999) m_finish = end_base;
     
