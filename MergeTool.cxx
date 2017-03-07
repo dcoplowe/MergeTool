@@ -183,6 +183,9 @@ void MergeTool::Run(){
             }
         }
         
+        cout << "start_base   = " << start_base << endl;
+        cout << "start_base_s = " << start_base_s << endl;
+        
 //        
 //        std::string ;
 //        std::string sub4;
