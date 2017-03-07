@@ -112,8 +112,8 @@ void MergeTool::InspectDir(){
     
     cout << "m_start == " << m_start << "  ||  m_finish == " << m_finish << endl;
     
-    if(m_start == -999 || m_finish == -999){
-        
+//    if(m_start == -999 || m_finish == -999){
+    
         //find start directory:
         
         cout << "Finding run range" << endl;
@@ -320,6 +320,8 @@ void MergeTool::InspectDir(){
         if(m_finish == -999) m_finish = end_base;
     
 }
+    
+    
 
 int main(int argc, char *argv[])
 {
