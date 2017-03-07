@@ -50,6 +50,9 @@ private:
     std::string m_basedir;
     
     void InspectDir();
+    bool GoodFile(const char* filename);
+    bool GoodMeta(const char* filename);
+    double getTChainPOT(TChain * ch, const char* branch);
     
 };
 
@@ -88,17 +91,112 @@ void MergeTool::Run(){
     TChain * recon = new TChain(m_analysis_tree.c_str());
     TChain * truth = new TChain("Truth");
     
+    int n_files = 0;
+    int n_mergedfiles = 0;
+    
+    TStopwatch ts;
+    
     for(int run = m_start; run < m_finish + 1; run++){
         
         string run_s = Form("%.8d", run);//This was .8d but we have already found this bit.
         string run_spars[3];
         for (int i = 0; i < 3; i++) run_spars[i] = run_s.substr( 2*(i + 1), 2);
         
-        string flist = Form("%s/%s/%s/%s/%s_*%s_*_%s*.root", m_basedir.c_str(), run_spars[0].c_str(), run_spars[1].c_str(), run_spars[2].c_str(),
+        string flist = Form("%s%s/%s/%s/%s_*%s_*_%s*.root", m_basedir.c_str(),
+                            run_spars[0].c_str(), run_spars[1].c_str(), run_spars[2].c_str(),
                             m_is_mc ? "SIM" : "MV", run_s.c_str(), m_analysis_name.c_str());
-        cout << "flist = " << flist << endl;
+        
+//        cout << "flist = " << flist << endl;
+        
+        glob_t g;
+        glob(flist.c_str(), 0, 0, &g);
+        
+        n_files += g.gl_pathc;
+        cout << " Run " << run << " : Adding " << g.gl_pathc << " files." << endl;
+        
+        for (int i = 0; i < (int)g.gl_pathc; i++){
+            const char* filename=g.gl_pathv[i];
+    
+            if(GoodFile(filename) && GoodMeta(filename)){
+                outfile->cd();
+                recon->Add(filename);
+                if(m_is_mc) truth->Add(filename);
+                n_mergedfiles++;
+            }
+            else cout << "Skipping bad file: " << filename << endl;
+        }
+        globfree(&g);
     }
     
+    cout << "Merging " << n_mergedfiles << "/" << n_files << " (" << 100*n_mergedfiles/n_files << ") files." << endl;
+    cout << "Producing recon tree: " << m_analysis_tree << "." << endl;
+    outfile->cd(); // Just in case the surrounding lines get separated
+    recon->Merge(outfile, 32000, "keep SortBasketsByBranch");
+    
+    if(m_is_mc){
+        cout << "Producing truth tree: Truth." << endl;
+        outfile->cd();
+        TTree * truth_copy = truth->CopyTree("");
+        truth_copy->Write();
+    }
+    
+    cout << "Producing truth tree: Meta." << endl;
+    double sumPOTUsed  = getTChainPOT(recon, "POT_Used");
+    double sumPOTTotal = getTChainPOT(recon, "POT_Total");
+    cout << "POT Breakdown: Total = " << sumPOTTotal << " Used = " << sumPOTUsed << endl;
+    outfile->cd();
+    TTree * meta = new TTree("Meta", "");
+    meta->Branch("POT_Used", &sumPOTUsed);
+    meta->Branch("POT_Total", &sumPOTTotal);
+    meta->Fill();
+    meta->Write();
+
+    
+    
+}
+
+bool MergeTool::GoodFile(const char* filename){
+    TFile f(filename);
+    if(f.IsZombie()) return false;
+    TTree* meta=(TTree*)f.Get("Meta");
+    if(!meta) return false;
+    if(!meta->GetBranch("POT_Total")) return false;
+    if(!meta->GetBranch("POT_Used")) return false;
+    if(!m_realdata && !f.Get("Truth")) return false;//Check this.
+    delete meta;//Added 210117
+    return true;
+}
+
+bool MergeTool::GoodMeta(const char* filename){
+    if(!m_check_meta_data) return true;
+    TFile f(filename);
+    if(f.IsZombie()) return false;
+    TTree* meta=(TTree*)f.Get("Meta");
+    if(!meta) return false;
+    if(meta->GetEntriesFast() == 0) return false;
+    if(!meta->GetBranch("POT_Used")) return false;
+    delete meta;//Added 210117
+    return true;
+}
+
+double MergeTool::getTChainPOT(TChain * ch, const char* branch){
+    double sumPOTUsed=0;
+    TObjArray * fileElements = ch->GetListOfFiles();
+    TIter next(fileElements);
+    TChainElement *chEl=0;
+    while (( chEl=(TChainElement*)next() )) {
+        TFile f(chEl->GetTitle());
+        TTree * t = (TTree*)f.Get("Meta");
+        if(!t){
+            cout << "No Meta tree in file " << chEl->GetTitle() << endl;
+            continue;
+        }
+        assert(t->GetEntries()==1);
+        t->GetEntry(0);
+        TLeaf* lUsed=t->GetLeaf(branch);
+        if(lUsed)         sumPOTUsed+=lUsed->GetValue();
+    }
+    return sumPOTUsed;
 }
 
 void MergeTool::InspectDir(){
