@@ -151,6 +151,9 @@ void MergeTool::Run(){
     meta->Branch("POT_Total", &sumPOTTotal);
     meta->Fill();
     meta->Write();
+    
+    outfile->Close();
+    delete outfile;
 
     
     
