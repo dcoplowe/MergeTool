@@ -136,9 +136,9 @@ void MergeTool::Run(){
     if(m_is_mc){
         cout << "Producing truth tree: Truth." << endl;
         outfile->cd();
-//        truth->Merge(outfile, 32000, "keep SortBasketsByBranch");
-        TTree * truth_copy = truth->CopyTree("");
-        truth_copy->Write();
+        truth->Merge(outfile, 32000, "keep SortBasketsByBranch");
+//        TTree * truth_copy = truth->CopyTree("");
+//        truth_copy->Write();
     }
     
     cout << "Producing Meta tree." << endl;
