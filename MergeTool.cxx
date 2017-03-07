@@ -149,6 +149,7 @@ void MergeTool::Run(){
                 a *= 1e2;
                 start_base += a;
                 start_base_s += sub1;
+                start_base_s += "/";
                 cout << "Found path: " << tmp << endl;
                 break;
             }
