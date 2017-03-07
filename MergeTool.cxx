@@ -34,11 +34,11 @@ private:
     
     std::string m_root_indir;
     std::string m_minerva_release;
-    std::string m_analysis;
-    sts::string m_analysis_tree;
-    
-    bool m_check_meta_data;
+    std::string m_analysis_name;
+    std::string m_analysis_tree;
+
     bool m_is_mc;
+    bool m_check_meta_data;
     
     int m_start;
     int m_finish;
@@ -58,8 +58,8 @@ MergeTool::MergeTool(std::string root_indir, std::string minerva_release, std::s
     cout << "m_is_mc           = " << (m_is_mc ? "Yes" : "No") << endl;
     cout << "m_check_meta_data = " << (m_check_meta_data ? "Yes" : "No") << endl;
     cout << "m_start           = " << m_start << endl;
-    cout << "m_finish          = " m_finish << endl;
-    cout << "m_outfilename     = " m_outfilename << endl;
+    cout << "m_finish          = " << m_finish << endl;
+    cout << "m_outfilename     = " << m_outfilename << endl;
 
 }
 
@@ -182,63 +182,63 @@ int main(int argc, char *argv[])
                 << "| MergeTool.exe -i /pnfs/minerva/persistant/persistent/users/dcoplowe/CC1P1Pi_PL13C_111216 -n 13200-13260 -m=2     |" << endl
                 << "|                                                                                                                  |" << endl
                 << "|******************************************************************************************************************|" << endl
-                << " " << endl
-                << " " << endl
-                << "|*********************** Run Options ****************************|" << endl
-                << "| Default is to merge files in the root directory of your analy- |" << endl
-                << "| sis. The number of runs also needs to be defined and can be    |" << endl
-                << "| either a single run or run range (see below).                  |" << endl
-                << "|                                                                |" << endl
-                << "| Options:                                                       |" << endl
-                << "|   -i   :  Set input file dir if \"-per\" is defined only the   |" << endl
-                << "|        :  root directory of your analysis in your persistent   |" << endl
-                << "|        :  directory is required.                               |" << endl
-                << "|        :                                                       |" << endl
-                << "|   -n   :  Run or run range: start-end e.g 13200-13250          |" << endl
-                << "|        :  will run over 50 runs from 13200 to 13250.           |" << endl
-                << "|        :                                                       |" << endl
-                << "|   -o   :  Set output file directory.                           |" << endl
-                << "|        :                                                       |" << endl
-                << "|  -per  :  Assume in/out files are in the users persistent      |" << endl
-                << "|        :  directory. In such cases \"-i\" becomes the root       |" << endl
-                << "|        :  directory name. (e.g. -per -i CC1P1Pi_PL13C_290916   |" << endl
-                << "|        :  to merge files in /pnfs/minerva/persistent/users/    |" << endl
-                << "|        :  dcoplowe/CC1P1Pi_PL13C_290916/                       |" << endl
-                << "|        :                                                       |" << endl
-                << "|   -a   :  Analysis tool name (Your analysis tool used to make  |" << endl
-                << "|        :  the root files you want to merge)                    |" << endl
-                << "         :  Default is currently " << analtool << endl
-                << "|        :                                                       |" << endl
-                << "|   -t   :  Set name of analysis tree.                           |" << endl
-                << "         :  Default is currently " << anatree << endl
-                << "|        :  If not set, this can be set in the PlotUtils requir- |" << endl
-                << "|        :  ements files.                                        |" << endl
-                << "|        :                                                       |" << endl
-                << "|   -s   :  Set save name.                                       |" << endl
-                << "|        :                                                       |" << endl
-                << "|   -v   :  Set version of input anatuple files (vXrYpZ).        |" << endl
-                << "|        :  If not specified, use current release.               |" << endl
-                << "|        :                                                       |" << endl
-                << "| -m     :  Option 1 (-m 1): Combine each run into single root   |" << endl
-                << "|        :  file.                                                |" << endl
-                << "|        :  Option 2 (-m 2): Combine output of (-m 1) into a     |" << endl
-                << "|        :  single root file.                                    |" << endl
-                << "|        :                                                       |" << endl
-                << "| -check :  Merge without checking POT in Meta tree is good      |" << endl
-                << "|        :  (exists).                                            |" << endl
-                << "|        :                                                       |" << endl
-                << "| -data  :  Run on a data file (merge without Truth tree). Def-  |" << endl
-                << "|        :  ault is to assume you are running on MC.             |" << endl
-                << "|        :                                                       |" << endl
-                << "| -full  :  Add full directory path. This enables you to merge   |" << endl
-                << "|        :  special runs where the sub directories are not       |" << endl
-                << "|        :  grid/central_value/minerva/ana. When \"-full\" is      |" << endl
-                << "|        :  defined simply set the full path up to and including |" << endl
-                << "|        :  ana using \"-i\".                                      |" << endl
-                << "|        :                                                       |" << endl
-                << "| -help  :  Print this.                                          |" << endl
-                << "|        :                                                       |" << endl
-                << "|****************************************************************|" << endl;
+//                << " " << endl
+//                << " " << endl
+//                << "|*********************** Run Options ****************************|" << endl
+//                << "| Default is to merge files in the root directory of your analy- |" << endl
+//                << "| sis. The number of runs also needs to be defined and can be    |" << endl
+//                << "| either a single run or run range (see below).                  |" << endl
+//                << "|                                                                |" << endl
+//                << "| Options:                                                       |" << endl
+//                << "|   -i   :  Set input file dir if \"-per\" is defined only the   |" << endl
+//                << "|        :  root directory of your analysis in your persistent   |" << endl
+//                << "|        :  directory is required.                               |" << endl
+//                << "|        :                                                       |" << endl
+//                << "|   -n   :  Run or run range: start-end e.g 13200-13250          |" << endl
+//                << "|        :  will run over 50 runs from 13200 to 13250.           |" << endl
+//                << "|        :                                                       |" << endl
+//                << "|   -o   :  Set output file directory.                           |" << endl
+//                << "|        :                                                       |" << endl
+//                << "|  -per  :  Assume in/out files are in the users persistent      |" << endl
+//                << "|        :  directory. In such cases \"-i\" becomes the root       |" << endl
+//                << "|        :  directory name. (e.g. -per -i CC1P1Pi_PL13C_290916   |" << endl
+//                << "|        :  to merge files in /pnfs/minerva/persistent/users/    |" << endl
+//                << "|        :  dcoplowe/CC1P1Pi_PL13C_290916/                       |" << endl
+//                << "|        :                                                       |" << endl
+//                << "|   -a   :  Analysis tool name (Your analysis tool used to make  |" << endl
+//                << "|        :  the root files you want to merge)                    |" << endl
+//                << "         :  Default is currently " << analtool << endl
+//                << "|        :                                                       |" << endl
+//                << "|   -t   :  Set name of analysis tree.                           |" << endl
+//                << "         :  Default is currently " << anatree << endl
+//                << "|        :  If not set, this can be set in the PlotUtils requir- |" << endl
+//                << "|        :  ements files.                                        |" << endl
+//                << "|        :                                                       |" << endl
+//                << "|   -s   :  Set save name.                                       |" << endl
+//                << "|        :                                                       |" << endl
+//                << "|   -v   :  Set version of input anatuple files (vXrYpZ).        |" << endl
+//                << "|        :  If not specified, use current release.               |" << endl
+//                << "|        :                                                       |" << endl
+//                << "| -m     :  Option 1 (-m 1): Combine each run into single root   |" << endl
+//                << "|        :  file.                                                |" << endl
+//                << "|        :  Option 2 (-m 2): Combine output of (-m 1) into a     |" << endl
+//                << "|        :  single root file.                                    |" << endl
+//                << "|        :                                                       |" << endl
+//                << "| -check :  Merge without checking POT in Meta tree is good      |" << endl
+//                << "|        :  (exists).                                            |" << endl
+//                << "|        :                                                       |" << endl
+//                << "| -data  :  Run on a data file (merge without Truth tree). Def-  |" << endl
+//                << "|        :  ault is to assume you are running on MC.             |" << endl
+//                << "|        :                                                       |" << endl
+//                << "| -full  :  Add full directory path. This enables you to merge   |" << endl
+//                << "|        :  special runs where the sub directories are not       |" << endl
+//                << "|        :  grid/central_value/minerva/ana. When \"-full\" is      |" << endl
+//                << "|        :  defined simply set the full path up to and including |" << endl
+//                << "|        :  ana using \"-i\".                                      |" << endl
+//                << "|        :                                                       |" << endl
+//                << "| -help  :  Print this.                                          |" << endl
+//                << "|        :                                                       |" << endl
+//                << "|****************************************************************|" << endl;
                 return 1; break;
             default: return 1;
         }
@@ -280,10 +280,10 @@ int main(int argc, char *argv[])
     cout << "|      MINERvA Release (-t): " << minerva_release << endl;
     if(!run_s.empty()) cout << "|             N Run(s) (-n): " << run_s << endl;
     cout << "|  Merge Data/MC files (-d): " << (is_mc ? "MC" : "DATA") << endl;
-    cout << "| Check if POT is good (-p): " << (meta_data_check ? "Yes" : "No") << endl;
+    cout << "| Check if POT is good (-p): " << (check_meta_data ? "Yes" : "No") << endl;
     cout << "|--------------------------------- Running ----------------------------------" << endl;
     
-    MergeTool * merge = new MergeTool(root_indir, minerva_release, analysis_name, analysis_tree, is_mc check_meta_data);
+    MergeTool * merge = new MergeTool(root_indir, minerva_release, analysis_name, analysis_tree, is_mc, check_meta_data);
     merge->SetRange(first_run, last_run);
     if(!outfilename.empty()) merge->SetOutFileName(outfilename);
     merge->Run();
