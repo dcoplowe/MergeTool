@@ -122,8 +122,8 @@ void MergeTool::Run(){
                 recon->Add(filename);
                 if(m_is_mc) truth->Add(filename);
                 n_mergedfiles++;
-//            }
-//            else cout << "Skipping bad file: " << filename << endl;
+            }
+            else cout << "Skipping bad file: " << filename << endl;
         }
         globfree(&g);
     }
