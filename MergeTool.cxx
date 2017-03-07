@@ -92,7 +92,7 @@ void MergeTool::Run(){
 //        
 //        if(m_start == -999) m_start = begin;
 //        if(m_finish == -999) m_finish = end;
-    }
+
 //
 //    if(m_outfilename.empty()){
 //        m_outfilename = "merged_" + %s + "_" + "runs" %08d+ "-" + %08d + ".root";
