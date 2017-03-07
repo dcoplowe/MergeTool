@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
     }
     
     string minerva_release( getenv("MINERVA_RELEASE") );
-    if(!minerva_release){
+    if(minerva_release.empty()){
         std::cerr << "[WARNING]: environment variable \"MINERVA_RELEASE\" not set. "
         "Cannot determine source tree location." << std::endl;
         return 1;
