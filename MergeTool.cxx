@@ -68,7 +68,7 @@ MergeTool::MergeTool(std::string root_indir, std::string minerva_release, std::s
     cout << "m_outfilename     = " << m_outfilename << endl;
     
     m_subpath = "grid/central_value/minerva/ana";
-    m_basedir = m_root_indir + "/" + subpath + "/" + m_minerva_release + "/";
+    m_basedir = m_root_indir + "/" + m_subpath + "/" + m_minerva_release + "/";
 
     cout << "m_basedir         = " << m_basedir << endl;
 
