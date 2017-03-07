@@ -85,7 +85,7 @@ void MergeTool::Run(){
         m_outfilename = Form("merged_runs%08d-%08d.root", m_start, m_finish);
     }
 
-    TFile * outfile = new TFile( (m_root_indir + "/"  + m_outfilename).c_str(), "RECREATE");
+    TFile * outfile = new TFile( (m_root_indir + m_outfilename).c_str(), "RECREATE");
     outfile->cd();
     
     TChain * recon = new TChain(m_analysis_tree.c_str());
