@@ -157,6 +157,30 @@ void MergeTool::Run(){
         cout << "start_base   = " << start_base << endl;
         cout << "start_base_s = " << start_base_s << endl;
         
+        for(int a = 0; a < 100; a++){
+            
+            std::string sub1 = Form("%.2d",a);
+            
+            std::string tmp = basedir + start_base_s + sub1;
+            
+            cout << "Checking if " << tmp << " exists" << endl;
+            
+            glob_t g;
+            glob(tmp.c_str(), 0, 0, &g);
+            
+            int npaths = g.gl_pathc;
+            
+            cout << "g.gl_pathc = " << g.gl_pathc << endl;
+            
+            if(npaths == 1){
+                a *= 1e2;
+                start_base += a;
+                start_base_s += sub1;
+                cout << "Found path: " << tmp << endl;
+                break;
+            }
+        }
+        
 //        
 //        std::string ;
 //        std::string sub4;
