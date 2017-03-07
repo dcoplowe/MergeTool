@@ -85,8 +85,8 @@ void MergeTool::Run(){
         m_outfilename = Form("merged_runs%08d-%08d.root", m_start, m_finish);
     }
 
-//    TFile * outfile = new TFile( (m_root_indir + m_outfilename).c_str(), "RECREATE");
-//    outfile->cd();
+    TFile * outfile = new TFile( (m_root_indir + m_outfilename).c_str(), "RECREATE");
+    outfile->cd();
     
     TChain * recon = new TChain(m_analysis_tree.c_str());
     TChain * truth = new TChain("Truth");
@@ -117,19 +117,19 @@ void MergeTool::Run(){
         for (int i = 0; i < (int)g.gl_pathc; i++){
             const char* filename=g.gl_pathv[i];
     
-            if(GoodFile(filename) && GoodMeta(filename)){
+//            if(GoodFile(filename) && GoodMeta(filename)){
                 outfile->cd();
                 recon->Add(filename);
                 if(m_is_mc) truth->Add(filename);
                 n_mergedfiles++;
-            }
-            else cout << "Skipping bad file: " << filename << endl;
+//            }
+//            else cout << "Skipping bad file: " << filename << endl;
         }
         globfree(&g);
     }
     
-    TFile * outfile = new TFile( (m_root_indir + m_outfilename).c_str(), "RECREATE");
-    outfile->cd();
+//    TFile * outfile = new TFile( (m_root_indir + m_outfilename).c_str(), "RECREATE");
+//    outfile->cd();
     
     cout << "Merging " << n_mergedfiles << "/" << n_files << " (" << (double)(100*n_mergedfiles/n_files) << "%) files." << endl;
     cout << "Producing recon tree: " << m_analysis_tree << "." << endl;
