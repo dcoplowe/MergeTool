@@ -40,16 +40,22 @@ private:
     bool m_is_mc;
     bool m_check_meta_data;
     
+    int m_00;
     int m_start;
     int m_finish;
     
     std::string m_outfilename;
     
+    std::string m_subpath;
+    std::string m_basedir;
+    
+    void InspectDir();
+    
 };
 
 #endif
 
-MergeTool::MergeTool(std::string root_indir, std::string minerva_release, std::string analysis_name, std::string analysis_tree, bool is_mc, bool check_meta_data) : m_root_indir(root_indir), m_minerva_release(minerva_release), m_analysis_name(analysis_name), m_analysis_tree(analysis_tree), m_is_mc(is_mc), m_check_meta_data(check_meta_data), m_start(-999), m_finish(-999), m_outfilename("") {
+MergeTool::MergeTool(std::string root_indir, std::string minerva_release, std::string analysis_name, std::string analysis_tree, bool is_mc, bool check_meta_data) : m_root_indir(root_indir), m_minerva_release(minerva_release), m_analysis_name(analysis_name), m_analysis_tree(analysis_tree), m_is_mc(is_mc), m_check_meta_data(check_meta_data), m_00(0), m_start(-999), m_finish(-999), m_outfilename("") {
 
     cout << "m_root_indir      = " << m_root_indir << endl;
     cout << "m_minerva_release = " << m_minerva_release << endl;
@@ -60,223 +66,17 @@ MergeTool::MergeTool(std::string root_indir, std::string minerva_release, std::s
     cout << "m_start           = " << m_start << endl;
     cout << "m_finish          = " << m_finish << endl;
     cout << "m_outfilename     = " << m_outfilename << endl;
+    
+    m_subpath = "grid/central_value/minerva/ana";
+    m_basedir = m_root_indir + "/" + subpath + "/" + m_minerva_release + "/";
+
+    cout << "m_basedir         = " << m_basedir << endl;
 
 }
 
 void MergeTool::Run(){
     
-    std::string subpath = "grid/central_value/minerva/ana";
-    std::string basedir = m_root_indir + "/" + subpath + "/" + m_minerva_release + "/";
-    
-    cout << "basedir = " << basedir << endl;
-    
-    cout << "m_start == " << m_start << "  ||  m_finish == " << m_finish << endl;
-    
-    if(m_start == -999 || m_finish == -999){
-        
-        //find start directory:
-        
-        cout << "Finding run range" << endl;
-        
-        for(int a = 0; a < 100; a++){
-        
-            std::string sub1 = Form("%.2d",a);
-            
-            std::string tmp = basedir + sub1;
-            
-            cout << "Checking if " << tmp << " exists" << endl;
-            
-            glob_t g;
-            glob(tmp.c_str(), 0, 0, &g);
-            
-            int npaths = g.gl_pathc;
-            
-            cout << "g.gl_pathc = " << g.gl_pathc << endl;
-            
-            if(npaths == 1){
-                basedir += sub1;
-                basedir += "/";
-                cout << "Found path: " << basedir << endl;
-                break;
-            }
-        }
-        
-        int start_base;
-        std::string start_base_s;
-        
-        for(int a = 0; a < 100; a++){
-         
-            std::string sub1 = Form("%.2d",a);
-            
-            std::string tmp = basedir + sub1;
-            
-            cout << "Checking if " << tmp << " exists" << endl;
-            
-            glob_t g;
-            glob(tmp.c_str(), 0, 0, &g);
-            
-            int npaths = g.gl_pathc;
-            
-            cout << "g.gl_pathc = " << g.gl_pathc << endl;
-            
-            if(npaths == 1){
-                start_base = a;
-                start_base_s = sub1;
-                cout << "Found path: " << tmp << endl;
-                break;
-            }
-        }
-        
-        start_base *= 1e4;
-        start_base_s += "/";
-        
-        for(int a = 0; a < 100; a++){
-            
-            std::string sub1 = Form("%.2d",a);
-            
-            std::string tmp = basedir + start_base_s + sub1;
-            
-            cout << "Checking if " << tmp << " exists" << endl;
-            
-            glob_t g;
-            glob(tmp.c_str(), 0, 0, &g);
-            
-            int npaths = g.gl_pathc;
-            
-            cout << "g.gl_pathc = " << g.gl_pathc << endl;
-            
-            if(npaths == 1){
-                a *= 1e2;
-                start_base += a;
-                start_base_s += sub1;
-                start_base_s += "/";
-                cout << "Found path: " << tmp << endl;
-                break;
-            }
-        }
-        
-        cout << "start_base   = " << start_base << endl;
-        cout << "start_base_s = " << start_base_s << endl;
-        
-        for(int a = 0; a < 100; a++){
-            
-            std::string sub1 = Form("%.2d",a);
-            
-            std::string tmp = basedir + start_base_s + sub1;
-            
-            cout << "Checking if " << tmp << " exists" << endl;
-            
-            glob_t g;
-            glob(tmp.c_str(), 0, 0, &g);
-            
-            int npaths = g.gl_pathc;
-            
-            cout << "g.gl_pathc = " << g.gl_pathc << endl;
-            
-            if(npaths == 1){
-                a *= 1e2;
-                start_base += a;
-                start_base_s += sub1;
-                start_base_s += "/";
-                cout << "Found path: " << tmp << endl;
-                break;
-            }
-        }
-        
-        cout << "start_base   = " << start_base << endl;
-        cout << "start_base_s = " << start_base_s << endl;
-        
-        
-        
-        
-        
-        int end_base;
-        std::string end_base_s;
-        
-        for(int a = 99; a > -1; a--){
-            
-            std::string sub1 = Form("%.2d",a);
-            
-            std::string tmp = basedir + sub1;
-            
-            cout << "Checking if " << tmp << " exists" << endl;
-            
-            glob_t g;
-            glob(tmp.c_str(), 0, 0, &g);
-            
-            int npaths = g.gl_pathc;
-            
-            cout << "g.gl_pathc = " << g.gl_pathc << endl;
-            
-            if(npaths == 1){
-                end_base = a;
-                end_base_s = sub1;
-                cout << "Found path: " << tmp << endl;
-                break;
-            }
-        }
-        
-        end_base *= 1e4;
-        end_base_s += "/";
-        
-        for(int a = 99; a > -1; a--){
-            
-            std::string sub1 = Form("%.2d",a);
-            
-            std::string tmp = basedir + end_base_s + sub1;
-            
-            cout << "Checking if " << tmp << " exists" << endl;
-            
-            glob_t g;
-            glob(tmp.c_str(), 0, 0, &g);
-            
-            int npaths = g.gl_pathc;
-            
-            cout << "g.gl_pathc = " << g.gl_pathc << endl;
-            
-            if(npaths == 1){
-                a *= 1e2;
-                end_base += a;
-                end_base_s += sub1;
-                end_base_s += "/";
-                cout << "Found path: " << tmp << endl;
-                break;
-            }
-        }
-        
-        cout << "end_base   = " << end_base << endl;
-        cout << "end_base_s = " << end_base_s << endl;
-        
-        for(int a = 99; a > -1; a--){
-            
-            std::string sub1 = Form("%.2d",a);
-            
-            std::string tmp = basedir + end_base_s + sub1;
-            
-            cout << "Checking if " << tmp << " exists" << endl;
-            
-            glob_t g;
-            glob(tmp.c_str(), 0, 0, &g);
-            
-            int npaths = g.gl_pathc;
-            
-            cout << "g.gl_pathc = " << g.gl_pathc << endl;
-            
-            if(npaths == 1){
-//                a *= 1e2;
-                end_base += a;
-                end_base_s += sub1;
-                end_base_s += "/";
-                cout << "Found path: " << tmp << endl;
-                break;
-            }
-        }
-        
-        cout << "start_base   = " << start_base << endl;
-        cout << "start_base_s = " << start_base_s << endl;
-        cout << "end_base   = " << end_base << endl;
-        cout << "end_base_s = " << end_base_s << endl;
-        
+    InspectDir();
 //        
 //        std::string ;
 //        std::string sub4;
@@ -303,6 +103,223 @@ void MergeTool::Run(){
     
 }
 
+void MergeTool::InspectDir(){
+    
+    std::string subpath = "grid/central_value/minerva/ana";
+    std::string basedir = m_root_indir + "/" + subpath + "/" + m_minerva_release + "/";
+    
+    cout << "basedir = " << basedir << endl;
+    
+    cout << "m_start == " << m_start << "  ||  m_finish == " << m_finish << endl;
+    
+    if(m_start == -999 || m_finish == -999){
+        
+        //find start directory:
+        
+        cout << "Finding run range" << endl;
+        
+        for(int a = 0; a < 100; a++){
+            
+            std::string sub1 = Form("%.2d",a);
+            
+            std::string tmp = basedir + sub1;
+            
+            //            cout << "Checking if " << tmp << " exists" << endl;
+            
+            glob_t g;
+            glob(tmp.c_str(), 0, 0, &g);
+            
+            int npaths = g.gl_pathc;
+            
+            //            cout << "g.gl_pathc = " << g.gl_pathc << endl;
+            
+            if(npaths == 1){
+                basedir += sub1;
+                basedir += "/";
+                m_00 = a;
+                //                cout << "Found path: " << basedir << endl;
+                break;
+            }
+        }
+        
+        
+        
+        int start_base;
+        std::string start_base_s;
+        
+        for(int a = 0; a < 100; a++){
+            
+            std::string sub1 = Form("%.2d",a);
+            
+            std::string tmp = basedir + sub1;
+            
+            //            cout << "Checking if " << tmp << " exists" << endl;
+            
+            glob_t g;
+            glob(tmp.c_str(), 0, 0, &g);
+            
+            int npaths = g.gl_pathc;
+            
+            //            cout << "g.gl_pathc = " << g.gl_pathc << endl;
+            
+            if(npaths == 1){
+                start_base = a;
+                start_base_s = sub1;
+                //                cout << "Found path: " << tmp << endl;
+                break;
+            }
+        }
+        
+        start_base *= 1e4;
+        start_base_s += "/";
+        
+        for(int a = 0; a < 100; a++){
+            
+            std::string sub1 = Form("%.2d",a);
+            
+            std::string tmp = basedir + start_base_s + sub1;
+            
+            //            cout << "Checking if " << tmp << " exists" << endl;
+            
+            glob_t g;
+            glob(tmp.c_str(), 0, 0, &g);
+            
+            int npaths = g.gl_pathc;
+            
+            //            cout << "g.gl_pathc = " << g.gl_pathc << endl;
+            
+            if(npaths == 1){
+                a *= 1e2;
+                start_base += a;
+                start_base_s += sub1;
+                start_base_s += "/";
+                //                cout << "Found path: " << tmp << endl;
+                break;
+            }
+        }
+        
+        //        cout << "start_base   = " << start_base << endl;
+        //        cout << "start_base_s = " << start_base_s << endl;
+        
+        for(int a = 0; a < 100; a++){
+            
+            std::string sub1 = Form("%.2d",a);
+            
+            std::string tmp = basedir + start_base_s + sub1;
+            
+            //            cout << "Checking if " << tmp << " exists" << endl;
+            
+            glob_t g;
+            glob(tmp.c_str(), 0, 0, &g);
+            
+            int npaths = g.gl_pathc;
+            
+            //            cout << "g.gl_pathc = " << g.gl_pathc << endl;
+            
+            if(npaths == 1){
+                a *= 1e2;
+                start_base += a;
+                start_base_s += sub1;
+                start_base_s += "/";
+                //                cout << "Found path: " << tmp << endl;
+                break;
+            }
+        }
+        
+        //        cout << "start_base   = " << start_base << endl;
+        //        cout << "start_base_s = " << start_base_s << endl;
+        
+        int end_base;
+        std::string end_base_s;
+        
+        for(int a = 99; a > -1; a--){
+            
+            std::string sub1 = Form("%.2d",a);
+            
+            std::string tmp = basedir + sub1;
+            
+            //            cout << "Checking if " << tmp << " exists" << endl;
+            
+            glob_t g;
+            glob(tmp.c_str(), 0, 0, &g);
+            
+            int npaths = g.gl_pathc;
+            
+            //            cout << "g.gl_pathc = " << g.gl_pathc << endl;
+            
+            if(npaths == 1){
+                end_base = a;
+                end_base_s = sub1;
+                //                cout << "Found path: " << tmp << endl;
+                break;
+            }
+        }
+        
+        end_base *= 1e4;
+        end_base_s += "/";
+        
+        for(int a = 99; a > -1; a--){
+            
+            std::string sub1 = Form("%.2d",a);
+            
+            std::string tmp = basedir + end_base_s + sub1;
+            
+            //            cout << "Checking if " << tmp << " exists" << endl;
+            
+            glob_t g;
+            glob(tmp.c_str(), 0, 0, &g);
+            
+            int npaths = g.gl_pathc;
+            
+            //            cout << "g.gl_pathc = " << g.gl_pathc << endl;
+            
+            if(npaths == 1){
+                a *= 1e2;
+                end_base += a;
+                end_base_s += sub1;
+                end_base_s += "/";
+                //                cout << "Found path: " << tmp << endl;
+                break;
+            }
+        }
+        
+        cout << "end_base   = " << end_base << endl;
+        cout << "end_base_s = " << end_base_s << endl;
+        
+        for(int a = 99; a > -1; a--){
+            
+            std::string sub1 = Form("%.2d",a);
+            
+            std::string tmp = basedir + end_base_s + sub1;
+            
+            //            cout << "Checking if " << tmp << " exists" << endl;
+            
+            glob_t g;
+            glob(tmp.c_str(), 0, 0, &g);
+            
+            int npaths = g.gl_pathc;
+            
+            //            cout << "g.gl_pathc = " << g.gl_pathc << endl;
+            
+            if(npaths == 1){
+                //                a *= 1e2;
+                end_base += a;
+                end_base_s += sub1;
+                end_base_s += "/";
+                //                cout << "Found path: " << tmp << endl;
+                break;
+            }
+        }
+        //        
+        //        cout << "start_base   = " << start_base << endl;
+        //        cout << "start_base_s = " << start_base_s << endl;
+        //        cout << "end_base   = " << end_base << endl;
+        //        cout << "end_base_s = " << end_base_s << endl;
+        
+        if(m_start == -999)  m_start = start_base;
+        if(m_finish == -999) m_finish = end_base;
+    
+}
 
 int main(int argc, char *argv[])
 {
