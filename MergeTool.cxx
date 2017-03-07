@@ -78,11 +78,6 @@ void MergeTool::Run(){
         
         cout << "Finding run range" << endl;
         
-//        std::string sub1;
-        std::string sub2;
-        std::string sub3;
-        std::string sub4;
-        
         for(int a = 0; a < 100; a++){
         
             std::string sub1 = Form("%.2d",a);
@@ -105,10 +100,33 @@ void MergeTool::Run(){
                 break;
             }
         }
+        
+        for(int a = 0; a < 100; a++){
+         
+            std::string sub1 = Form("%.2d",a);
+            
+            std::string tmp = basedir + sub1;
+            
+            cout << "Checking if " << tmp << " exists" << endl;
+            
+            glob_t g;
+            glob(tmp.c_str(), 0, 0, &g);
+            
+            int npaths = g.gl_pathc;
+            
+            cout << "g.gl_pathc = " << g.gl_pathc << endl;
+            
+            if(npaths == 1){
+                basedir += sub1;
+                basedir += "/";
+                cout << "Found path: " << basedir << endl;
+                break;
+            }
+        }
 //        
-//        for(int a = 0; a < 100; a++){
-//            
-//        }
+//        std::string ;
+//        std::string sub4;
+//
 //        
 //        for(int a = 0; a < 100; a++){
 //            
@@ -120,8 +138,8 @@ void MergeTool::Run(){
 //        
 //        if(m_start == -999) m_start = begin;
 //        if(m_finish == -999) m_finish = end;
-//    }
-//    
+    }
+//
 //    if(m_outfilename.empty()){
 //        m_outfilename = "merged_" + %s + "_" + "runs" %08d+ "-" + %08d + ".root";
     }
