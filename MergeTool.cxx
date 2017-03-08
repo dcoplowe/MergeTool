@@ -86,8 +86,8 @@ void MergeTool::Run(){
         m_outfilename = Form("merged_runs%08d-%08d.root", m_start, m_finish);
     }
 
-    TFile * outfile = new TFile( (m_root_indir + m_outfilename).c_str(), "RECREATE");
-    outfile->cd();
+//    TFile * outfile = new TFile( (m_root_indir + m_outfilename).c_str(), "RECREATE");
+//    outfile->cd();
     
     TChain * recon = new TChain(m_analysis_tree.c_str());
     TChain * truth = new TChain("Truth");
@@ -129,8 +129,8 @@ void MergeTool::Run(){
         globfree(&g);
     }
     
-//    TFile * outfile = new TFile( (m_root_indir + m_outfilename).c_str(), "RECREATE");
-//    outfile->cd();
+    TFile * outfile = new TFile( (m_root_indir + m_outfilename).c_str(), "RECREATE");
+    outfile->cd();
     
     cout << "Merging " << n_mergedfiles << "/" << n_files << " (" << (double)(100*n_mergedfiles/n_files) << "%) files." << endl;
     cout << "Producing recon tree: " << m_analysis_tree << "." << endl;
@@ -142,7 +142,7 @@ void MergeTool::Run(){
     Int_t percent = recon_entries/20;
     
     for(Int_t evt = 0; evt < recon_entries; evt++){
-        if(evt%percent==0) cout << "Analysed : "<< ((double)evt/(double)recon_entries)*100. << "%" << endl;
+        if(evt%percent==0) cout << Form("Analysed : %.2f%%", ((double)evt/(double)recon_entries)*100.) << endl;
         recon->GetEntry(evt);
         recon_clone->Fill();
     }
