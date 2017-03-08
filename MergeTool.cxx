@@ -142,7 +142,7 @@ void MergeTool::Run(){
     Int_t percent = recon_entries/20;
     
     for(Int_t evt = 0; evt < recon_entries; evt++){
-        if(i%percent==0) cout << "Analysed : "<< ((double)evt/(double)recon_entries)*100. << "%" << endl;
+        if(evt%percent==0) cout << "Analysed : "<< ((double)evt/(double)recon_entries)*100. << "%" << endl;
         recon->GetEntry(evt);
         recon_clone->Fill();
     }
