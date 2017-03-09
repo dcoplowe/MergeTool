@@ -93,7 +93,7 @@ void MergeTool::Run(){
     if(m_outfilename.find("/") == std::string::npos){
         string user_dat_dir = "/minerva/data/users/" + username + "/";
         glob_t g_user_dat_dir;
-        glob(flist.c_str(), 0, 0, &g_user_dat_dir);
+        glob(user_dat_dir.c_str(), 0, 0, &g_user_dat_dir);
         if( !((int)g_user_dat_dir.gl_pathc == 1) ){
             cout << "[ERROR] : No user directory in minerva data directory: /minerva/data/users/" << endl;
             cout << "[ERROR] : Merge tool requires the following directory: " << user_dat_dir << endl;
