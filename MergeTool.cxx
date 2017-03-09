@@ -15,7 +15,6 @@
 #include <cassert>
 #include <stdlib.h>// or cstdlib is c++cstdio
 #include "TTree.h"
-#include <stdio.h>
 
 #ifndef __CINT__
 #include "glob.h"
@@ -172,17 +171,17 @@ void MergeTool::Run(){
 
     //Move merged file to correct directory:
     if(mv_file){
-        if(rename(saveout.c_str(), (m_root_indir + m_outfilename).c_str())){
-            cout << "Moved from temporary location to perminant directory" << endl;
-            cout << "From :" << saveout << endl;
-            cout << "To   :" << m_root_indir << m_outfilename << endl;
-            cout << "       SUCCESS       " << endl;
-        }
-        else{
+        if(TSystem::Rename(saveout.c_str(), (m_root_indir + m_outfilename).c_str())){
             cout << "Failed to move from temporary location to perminant directory" << endl;
             cout << "From :" << saveout << endl;
             cout << "To   :" << m_root_indir << m_outfilename << endl;
-            cout << "       FAILURE       " << endl;
+            cout << "                                    FAILURE       " << endl;
+        }
+        else{
+            cout << "Moved from temporary location to perminant directory" << endl;
+            cout << "From :" << saveout << endl;
+            cout << "To   :" << m_root_indir << m_outfilename << endl;
+            cout << "                                    SUCCESS       " << endl;
         }
     }
     
@@ -601,7 +600,7 @@ int main(int argc, char *argv[])
     }
     
     cout << "|---------------------------------- Inputs ----------------------------------" << endl;
-    cout << "|               Input  (-i): " << root_indir << endl;
+    cout << "|                Input (-i): " << root_indir << endl;
     if(!outfilename.empty()) cout << "|               Output (-o): " << outfilename << endl;
     cout << "|   Analysis Tree Name (-t): " << analysis_tree << endl;
     cout << "|   Analysis Tool Name (-a): " << analysis_name<< endl;
