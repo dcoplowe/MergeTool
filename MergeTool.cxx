@@ -13,8 +13,9 @@
 #include <iostream>
 #include <string>
 #include <cassert>
-#include <stdlib.h>// or cstdlib is c++
+#include <stdlib.h>// or cstdlib is c++cstdio
 #include "TTree.h"
+#include <stdio.h>
 
 #ifndef __CINT__
 #include "glob.h"
@@ -41,7 +42,6 @@ private:
     bool m_is_mc;
     bool m_check_meta_data;
     
-    int m_00;
     int m_start;
     int m_finish;
     
@@ -59,23 +59,19 @@ private:
 
 #endif
 
-MergeTool::MergeTool(std::string root_indir, std::string minerva_release, std::string analysis_name, std::string analysis_tree, bool is_mc, bool check_meta_data) : m_root_indir(root_indir), m_minerva_release(minerva_release), m_analysis_name(analysis_name), m_analysis_tree(analysis_tree), m_is_mc(is_mc), m_check_meta_data(check_meta_data), m_00(0), m_start(-999), m_finish(-999), m_outfilename("") {
-
-    cout << "m_root_indir      = " << m_root_indir << endl;
-    cout << "m_minerva_release = " << m_minerva_release << endl;
-    cout << "m_analysis_name   = " << m_analysis_name << endl;
-    cout << "m_analysis_tree   = " << m_analysis_tree << endl;
-    cout << "m_is_mc           = " << (m_is_mc ? "Yes" : "No") << endl;
-    cout << "m_check_meta_data = " << (m_check_meta_data ? "Yes" : "No") << endl;
-    cout << "m_start           = " << m_start << endl;
-    cout << "m_finish          = " << m_finish << endl;
-    cout << "m_outfilename     = " << m_outfilename << endl;
-    
+MergeTool::MergeTool(std::string root_indir, std::string minerva_release, std::string analysis_name, std::string analysis_tree, bool is_mc, bool check_meta_data) : m_root_indir(root_indir), m_minerva_release(minerva_release), m_analysis_name(analysis_name), m_analysis_tree(analysis_tree), m_is_mc(is_mc), m_check_meta_data(check_meta_data), m_start(-999), m_finish(-999), m_outfilename("") {
+//    cout << "m_root_indir      = " << m_root_indir << endl;
+//    cout << "m_minerva_release = " << m_minerva_release << endl;
+//    cout << "m_analysis_name   = " << m_analysis_name << endl;
+//    cout << "m_analysis_tree   = " << m_analysis_tree << endl;
+//    cout << "m_is_mc           = " << (m_is_mc ? "Yes" : "No") << endl;
+//    cout << "m_check_meta_data = " << (m_check_meta_data ? "Yes" : "No") << endl;
+//    cout << "m_start           = " << m_start << endl;
+//    cout << "m_finish          = " << m_finish << endl;
+//    cout << "m_outfilename     = " << m_outfilename << endl;
     m_subpath = "grid/central_value/minerva/ana";
     m_basedir = m_root_indir + "/" + m_subpath + "/" + m_minerva_release + "/";
-
-    cout << "m_basedir         = " << m_basedir << endl;
-
+//    cout << "m_basedir         = " << m_basedir << endl;
 }
 
 void MergeTool::Run(){
@@ -85,9 +81,31 @@ void MergeTool::Run(){
     if(m_outfilename.empty()){
         m_outfilename = Form("merged_runs%08d-%08d.root", m_start, m_finish);
     }
+    
+    string username( getenv("USER") );
+    if(username.empty()){
+        std::cout << "[ERROR] : Environment variable \"USER\" not found. This is required for merge." << std::endl;
+        exit(0);
+    }
 
+    bool mv_file = false;
+    string saveout;
+    if(m_outfilename.find("/") == std::string::npos){
+        string user_dat_dir = "/minerva/data/users/" + username + "/";
+        glob_t g_user_dat_dir;
+        glob(flist.c_str(), 0, 0, &g_user_dat_dir);
+        if( !((int)g_user_dat_dir.gl_pathc == 1) ){
+            cout << "[ERROR] : No user directory in minerva data directory: /minerva/data/users/" << endl;
+            cout << "[ERROR] : Merge tool requires the following directory: " << user_dat_dir << endl;
+        }
+        globfree(&g_user_dat_dir);
+        saveout = user_dat_dir + m_outfilename;
+        mv_file = true;
+    }
+    else saveout = m_outfilename;
+    
 //    TFile * outfile = new TFile( (m_root_indir + m_outfilename).c_str(), "RECREATE");
-    TFile * outfile = new TFile( ("/minerva/data/users/dcoplowe/" + m_outfilename).c_str(), "RECREATE");
+    TFile * outfile = new TFile(saveout.c_str(), "RECREATE");
     outfile->cd();
     
     TChain * recon = new TChain(m_analysis_tree.c_str());
@@ -108,8 +126,6 @@ void MergeTool::Run(){
                             run_spars[0].c_str(), run_spars[1].c_str(), run_spars[2].c_str(),
                             m_is_mc ? "SIM" : "MV", run_s.c_str(), m_analysis_name.c_str());
         
-//        cout << "flist = " << flist << endl;
-        
         glob_t g;
         glob(flist.c_str(), 0, 0, &g);
         
@@ -120,7 +136,6 @@ void MergeTool::Run(){
             const char* filename=g.gl_pathv[i];
     
             if(GoodFile(filename) && GoodMeta(filename)){
-//                outfile->cd();
                 recon->Add(filename);
                 if(m_is_mc) truth->Add(filename);
                 n_mergedfiles++;
@@ -130,32 +145,13 @@ void MergeTool::Run(){
         globfree(&g);
     }
     
-//    TFile * outfile = new TFile( (m_root_indir + m_outfilename).c_str(), "RECREATE");
-//    outfile->cd();
-    
     cout << "Merging " << n_mergedfiles << "/" << n_files << " (" << (double)(100*n_mergedfiles/n_files) << "%) files." << endl;
-    cout << "Producing recon tree: " << m_analysis_tree << "." << endl;
+    cout << "Producing recon tree: " << m_analysis_tree << endl;
     outfile->cd(); // Just in case the surrounding lines get separated
     recon->Merge(outfile, 32000, "keep SortBasketsByBranch");
-
-//    TTree * recon_clone = (TTree*)recon->CloneTree(0);
-//    Int_t recon_entries = recon->GetEntries();
-//    Int_t percent = recon_entries/20;
-//    
-//    for(Int_t evt = 0; evt < recon_entries; evt++){
-//        if(evt%percent==0) cout << Form("Analysed : %.1f%%", ((double)evt/(double)recon_entries)*100.) << endl;
-//        recon->GetEntry(evt);
-//        recon_clone->Fill();
-//    }
-//    recon_clone->Write();
-    
-//    
-//    
-//    
     if(m_is_mc){
         cout << "Producing truth tree: Truth." << endl;
         outfile->cd();
-//        truth->Merge(outfile, 32000, "keep SortBasketsByBranch");
         TTree * truth_copy = truth->CopyTree("");
         truth_copy->Write();
     }
@@ -174,7 +170,21 @@ void MergeTool::Run(){
     outfile->Close();
     delete outfile;
 
-    
+    //Move merged file to correct directory:
+    if(mv_file){
+        if(rename(saveout.c_str(), (m_root_indir + m_outfilename).c_str())){
+            cout << "Moved from temporary location to perminant directory" << endl;
+            cout << "From :" << saveout << endl;
+            cout << "To   :" << m_root_indir << m_outfilename << endl;
+            cout << "       SUCCESS       " << endl;
+        }
+        else{
+            cout << "Failed to move from temporary location to perminant directory" << endl;
+            cout << "From :" << saveout << endl;
+            cout << "To   :" << m_root_indir << m_outfilename << endl;
+            cout << "       FAILURE       " << endl;
+        }
+    }
     
 }
 
@@ -444,10 +454,6 @@ void MergeTool::InspectDir(){
 
 int main(int argc, char *argv[])
 {
-//    string username( getenv("USER") );
-//    if(username.empty()){
-//        std::cout << "[WARNING]: Environment variable \"USER\" not found." << std::endl;
-//    }
     
     string analysis_tree( getenv("ANATREENAME") );
     if(analysis_tree.empty()){
