@@ -171,7 +171,8 @@ void MergeTool::Run(){
 
     //Move merged file to correct directory:
     if(mv_file){
-        if(TSystem::Rename(saveout.c_str(), (m_root_indir + m_outfilename).c_str())){
+        TSystem syst;
+        if(syst.Rename(saveout.c_str(), (m_root_indir + m_outfilename).c_str())){
             cout << "Failed to move from temporary location to perminant directory" << endl;
             cout << "From :" << saveout << endl;
             cout << "To   :" << m_root_indir << m_outfilename << endl;
