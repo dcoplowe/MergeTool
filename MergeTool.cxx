@@ -24,7 +24,7 @@ using namespace std;
 
 class MergeTool {
 public:
-    MergeTool(std::string root_indir, std::string minerva_release, std::string analysis_name, std::string analysis_tree, bool is_mc, bool check_meta_data);
+    MergeTool(std::string root_indir, std::string minerva_release, std::string analysis_name, std::string analysis_tree, bool is_mc, bool check_meta_data, bool include_header);
     ~MergeTool(){;}
     
     void SetRange(int start = -999, int finish = -999){ m_start = start; m_finish = finish; }
@@ -40,6 +40,7 @@ private:
 
     bool m_is_mc;
     bool m_check_meta_data;
+    bool m_include_header;
     
     int m_start;
     int m_finish;
@@ -58,7 +59,7 @@ private:
 
 #endif
 
-MergeTool::MergeTool(std::string root_indir, std::string minerva_release, std::string analysis_name, std::string analysis_tree, bool is_mc, bool check_meta_data) : m_root_indir(root_indir), m_minerva_release(minerva_release), m_analysis_name(analysis_name), m_analysis_tree(analysis_tree), m_is_mc(is_mc), m_check_meta_data(check_meta_data), m_start(-999), m_finish(-999), m_outfilename("") {
+MergeTool::MergeTool(std::string root_indir, std::string minerva_release, std::string analysis_name, std::string analysis_tree, bool is_mc, bool check_meta_data, bool include_header) : m_root_indir(root_indir), m_minerva_release(minerva_release), m_analysis_name(analysis_name), m_analysis_tree(analysis_tree), m_is_mc(is_mc), m_check_meta_data(check_meta_data), m_include_header(include_header), m_start(-999), m_finish(-999), m_outfilename("") {
 //    cout << "m_root_indir      = " << m_root_indir << endl;
 //    cout << "m_minerva_release = " << m_minerva_release << endl;
 //    cout << "m_analysis_name   = " << m_analysis_name << endl;
@@ -109,6 +110,8 @@ void MergeTool::Run(){
     
     TChain * recon = new TChain(m_analysis_tree.c_str());
     TChain * truth = new TChain("Truth");
+    TChain * header;
+    if (m_include_header) header = new TChain("Header");
     
     int n_files = 0;
     int n_mergedfiles = 0;
@@ -137,6 +140,7 @@ void MergeTool::Run(){
             if(GoodFile(filename) && GoodMeta(filename)){
                 recon->Add(filename);
                 if(m_is_mc) truth->Add(filename);
+                if(m_include_header) header->Add(filename);
                 n_mergedfiles++;
             }
             else cout << "Skipping bad file: " << filename << endl;
@@ -153,6 +157,13 @@ void MergeTool::Run(){
         outfile->cd();
         TTree * truth_copy = truth->CopyTree("");
         truth_copy->Write();
+    }
+    
+    if(m_include_header){
+        cout << "Producing header tree: Header." << endl;
+        outfile->cd();
+        TTree * header_copy = header->CopyTree("");
+        header_copy->Write();
     }
     
     cout << "Producing Meta tree." << endl;
@@ -477,9 +488,10 @@ int main(int argc, char *argv[])
     string outfilename;
     bool is_mc = true;
     bool check_meta_data = true;
+    bool include_header = false;
     
     char cc;
-    while ((cc = getopt(argc, argv, "v:i:o:t:a:d::p::n:h")) != -1) {
+    while ((cc = getopt(argc, argv, "v:i:o:t:a:d::p::n:f:h")) != -1) {
         switch (cc){
             case 'v':   minerva_release = string(optarg);   break;
             case 'i':   root_indir      = string(optarg);   break;
@@ -489,6 +501,7 @@ int main(int argc, char *argv[])
             case 'd':   is_mc           = false;            break;
             case 'p':   check_meta_data = false;            break;
             case 'n':   run_s           = string(optarg);   break;
+            case 'f':   include_header  = true;             break;
             case 'h':
                 //cout << argv[0] << endl
                 cout << "|************************************************** Example *******************************************************|" << endl
@@ -609,9 +622,10 @@ int main(int argc, char *argv[])
     if(!run_s.empty()) cout << "|             N Run(s) (-n): " << run_s << endl;
     cout << "|  Merge Data/MC files (-d): " << (is_mc ? "MC" : "DATA") << endl;
     cout << "| Check if POT is good (-p): " << (check_meta_data ? "Yes" : "No") << endl;
+    cout << "|       Include header (-f): " << (include_header ? "Yes" : "No") << endl;
     cout << "|--------------------------------- Running ----------------------------------" << endl;
     
-    MergeTool * merge = new MergeTool(root_indir, minerva_release, analysis_name, analysis_tree, is_mc, check_meta_data);
+    MergeTool * merge = new MergeTool(root_indir, minerva_release, analysis_name, analysis_tree, is_mc, check_meta_data, include_header);
     merge->SetRange(first_run, last_run);
     if(!outfilename.empty()) merge->SetOutFileName(outfilename);
     merge->Run();
