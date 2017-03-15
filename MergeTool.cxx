@@ -491,7 +491,7 @@ int main(int argc, char *argv[])
     bool include_header = false;
     
     char cc;
-    while ((cc = getopt(argc, argv, "v:i:o:t:a:d::p::n:f:h")) != -1) {
+    while ((cc = getopt(argc, argv, "v:i:o:t:a:d::p::n:f::h")) != -1) {
         switch (cc){
             case 'v':   minerva_release = string(optarg);   break;
             case 'i':   root_indir      = string(optarg);   break;
